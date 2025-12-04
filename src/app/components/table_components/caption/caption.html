@@ -1,0 +1,9 @@
+<div style="display: flex; flex-direction: row; justify-content: space-between">
+  <p>Default Caption</p>
+  <input
+    pInputText
+    type="text"
+    (input)="dt.filterGlobal($event.target.value, 'contains')"
+    placeholder="Search keyword"
+  />
+</div>

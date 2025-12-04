@@ -1,0 +1,87 @@
+<p-table
+  #dt
+  [columns]="tableConfig.columns"
+  [value]="tableConfig.value || []"
+  [size]="tableConfig.size"
+  [showGridlines]="tableConfig.showGridlines"
+  [stripedRows]="tableConfig.stripedRows"
+  [paginator]="tableConfig.paginator"
+  [rows]="tableConfig.rows"
+  [rowsPerPageOptions]="[5, 10, 20]"
+>
+  <!----------- Passed Sections ----------->
+  @if (captionTemplate) {
+  <ng-template #caption>
+    <ng-container [ngTemplateOutlet]="captionTemplate"></ng-container>
+  </ng-template>
+
+  } @if (headerTemplate) {
+  <ng-template #header>
+    <ng-container
+      [ngTemplateOutlet]="headerTemplate"
+      [ngTemplateOutletContext]="{ $implicit: tableConfig.columns }"
+    ></ng-container>
+  </ng-template>
+
+  } @if (bodyTemplate) {
+  <ng-template #body let-product>
+    <ng-container
+      [ngTemplateOutlet]="bodyTemplate"
+      [ngTemplateOutletContext]="{ $implicit: product, columns: tableConfig.columns }"
+    ></ng-container>
+  </ng-template>
+  } @if (footerTemplate) {
+  <ng-template #footer>
+    <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
+  </ng-template>
+
+  }
+
+  <!----------- Defaul Sections ----------->
+
+  <!-- Caption Section -->
+
+  @if (!captionTemplate) {
+  <ng-template #caption>
+    <app-caption [dt]="dt" />
+  </ng-template>
+  }
+
+  <!-- Header Section -->
+  @if (!headerTemplate) {
+  <ng-template #header>
+    <tr>
+      @for (column of tableConfig.columns; track ($index + 'header')) {
+      <th [pSortableColumn]="column.sortable ? column.field : undefined">
+        <app-header [column]="column" ></app-header>
+            <ng-container [ngTemplateOutlet]="column.filterTemplate"></ng-container>
+      </th>
+      }
+    </tr>
+
+  </ng-template>
+  }
+  <!-- Body Section -->
+  @if (!bodyTemplate) {
+  <ng-template #body let-product let-columns="columns">
+    <tr [ngStyle]="product._sytle" [ngClass]="product._class">
+      @for (col of columns; track ($index + 'body_col')) {
+      <td>
+        <app-body [column]="col" [data]="product" />
+      </td>
+      }
+    </tr>
+  </ng-template>
+  }
+
+  <!-- Footer Section -->
+  @if (!footerTemplate) {
+  <ng-template #footer>
+    <tr>
+      <td colSpan="100%">
+        <app-footer />
+      </td>
+    </tr>
+  </ng-template>
+  }
+</p-table>

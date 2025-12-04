@@ -1,0 +1,8 @@
+::ng-deep .bg-primary {
+  font-size: 1.25rem;
+}
+
+::ng-deep .text-primary-contrast {
+  background-color: rgb(0, 0, 0) !important;
+  color: rgb(255, 255, 255) !important;
+}
