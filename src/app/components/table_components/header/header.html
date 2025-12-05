@@ -5,8 +5,9 @@
     @if(column().sortable){
       <p-sortIcon [field]="column().field" />
     }
-    
   </div>
-  <p-columnFilter type="text" [field]="column().field" display="menu"></p-columnFilter>
+  @if (column().filterable) {
+      <p-columnFilter [type]="column().filterType || 'text' " [field]="column().field" display="menu"></p-columnFilter>
+  }
 </div>
 

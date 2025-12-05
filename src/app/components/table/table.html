@@ -1,13 +1,20 @@
 <p-table
   #dt
-  [columns]="tableConfig.columns"
-  [value]="tableConfig.value || []"
-  [size]="tableConfig.size"
-  [showGridlines]="tableConfig.showGridlines"
-  [stripedRows]="tableConfig.stripedRows"
-  [paginator]="tableConfig.paginator"
-  [rows]="tableConfig.rows"
+  [columns]="_generatedTableConfig().columns"
+  [value]="_generatedTableConfig().value || []"
+  [loading]="_generatedTableConfig().isLoading"
+  [size]="_generatedTableConfig().size"
+  [showGridlines]="_generatedTableConfig().showGridlines"
+  [stripedRows]="_generatedTableConfig().stripedRows"
+  [paginator]="_generatedTableConfig().paginator"
+  [rows]="_generatedTableConfig().rows"
+  [first]="_generatedTableConfig().first"
+  [showCurrentPageReport]="_generatedTableConfig().showCurrentPageReport"
+  [currentPageReportTemplate]="_generatedTableConfig().currentPageReportTemplate || ''"
   [rowsPerPageOptions]="[5, 10, 20]"
+  [lazy]="_generatedTableConfig().lazy"
+  (onLazyLoad)="undefiendHandler(_generatedTableConfig().onLazyLoading,$event)"
+  [totalRecords]="_generatedTableConfig().totalRecords || 0"
 >
   <!----------- Passed Sections ----------->
   @if (captionTemplate) {
@@ -19,7 +26,7 @@
   <ng-template #header>
     <ng-container
       [ngTemplateOutlet]="headerTemplate"
-      [ngTemplateOutletContext]="{ $implicit: tableConfig.columns }"
+      [ngTemplateOutletContext]="{ $implicit: _generatedTableConfig().columns }"
     ></ng-container>
   </ng-template>
 
@@ -27,7 +34,7 @@
   <ng-template #body let-product>
     <ng-container
       [ngTemplateOutlet]="bodyTemplate"
-      [ngTemplateOutletContext]="{ $implicit: product, columns: tableConfig.columns }"
+      [ngTemplateOutletContext]="{ $implicit: product, columns: _generatedTableConfig().columns }"
     ></ng-container>
   </ng-template>
   } @if (footerTemplate) {
@@ -51,14 +58,13 @@
   @if (!headerTemplate) {
   <ng-template #header>
     <tr>
-      @for (column of tableConfig.columns; track ($index + 'header')) {
+      @for (column of _generatedTableConfig().columns; track ($index + 'header')) {
       <th [pSortableColumn]="column.sortable ? column.field : undefined">
-        <app-header [column]="column" ></app-header>
-            <ng-container [ngTemplateOutlet]="column.filterTemplate"></ng-container>
+        <app-header [column]="column"></app-header>
+        <!-- <ng-container [ngTemplateOutlet]="column.filterTemplate"></ng-container> -->
       </th>
       }
     </tr>
-
   </ng-template>
   }
   <!-- Body Section -->

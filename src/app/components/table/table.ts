@@ -4,8 +4,12 @@ import {
   TemplateRef,
   ContentChild,
   effect,
+  computed,
+  signal,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
-import { TableModule } from 'primeng/table';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -20,6 +24,8 @@ import { Caption } from '../table_components/caption/caption';
 import { Footer } from '../table_components/footer/footer';
 import { Header } from '../table_components/header/header';
 import { Body } from '../table_components/body/body';
+import { getTableConfig } from '../../utils/table.interface';
+
 @Component({
   selector: 'app-table',
   imports: [
@@ -38,14 +44,19 @@ import { Body } from '../table_components/body/body';
     Header,
     Body,
     NgStyle,
-    NgClass
-],
+    NgClass,
+  ],
   templateUrl: './table.html',
   styleUrl: './table.css',
   host: { class: 'ignore-wrapper' },
 })
-export class Table {
+export class Table implements OnChanges {
   @Input() tableConfig: TableConfig = {};
+
+  _generatedTableConfig = signal<TableConfig>(getTableConfig(this.tableConfig));
+  ngOnChanges(changes: SimpleChanges): void {
+    this._generatedTableConfig.update((u) => ({ ...u, ...this.tableConfig }));
+  }
 
   @ContentChild('defaultHeader', { static: false }) defaultHeader?: TemplateRef<any>;
 
@@ -62,12 +73,9 @@ export class Table {
   }
   addAttributes() {
     this.tableConfig.value?.forEach((v) => {
-      console.log(v.id);
       v._sytle = this.undefiendHandler(this.tableConfig.rowStyle, v);
       v._class = this.undefiendHandler(this.tableConfig.rowClass, v);
     });
-    console.log(this.tableConfig?.columns)
- 
   }
   undefiendHandler(func: Function | undefined, input: any) {
     if (func != undefined) {
@@ -75,4 +83,6 @@ export class Table {
     }
     return undefined;
   }
+
+ 
 }
