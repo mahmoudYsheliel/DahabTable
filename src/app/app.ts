@@ -1,4 +1,4 @@
-import { Component, signal, ViewChild, effect } from '@angular/core';
+import { Component, signal, ViewChild, effect, viewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { Product } from './utils/product.interface';
 import { generateProducts } from './utils/data_generator';
@@ -11,10 +11,11 @@ import { TagModule } from 'primeng/tag';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableLazyLoadEvent } from 'primeng/table';
+import { BadgeModule } from "primeng/badge";
 
 @Component({
   selector: 'app-root',
-  imports: [ButtonModule, Table, SelectModule, TagModule, CommonModule, FormsModule],
+  imports: [ButtonModule, Table, SelectModule, TagModule, CommonModule, FormsModule, BadgeModule],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -22,8 +23,42 @@ export class App {
   protected readonly title = signal('DahabTable');
   products: Product[] = generateProducts(20);
   @ViewChild('quantityFilter', { static: true }) quantityFilter!: TemplateRef<any>;
+  @ViewChild('customColumnDesign', { static: true }) customColumnDesign!: TemplateRef<any>;
 
-  cols: ColumnConfig[] = generateColumnConfig([
+cols= signal<ColumnConfig[]> ( []);
+tableConfig = signal<TableConfig>({columns: this.cols});
+  // cols= signal<ColumnConfig[]> ( [
+  //   { field: 'id', header: 'ID', sortable: false, filterable: false },
+  //   { field: 'code', header: 'Code' },
+  //   { field: 'name', header: 'Name' },
+  //   {
+  //     field: 'price',
+  //     header: 'Price',
+  //     filterType: 'numeric',
+  //     columnDesgin: this.customColumnDesign,
+  //   },
+  //   ]);
+  // tableConfig = signal<TableConfig>({
+  //     columns: this.cols,
+  //     value: this.products,
+  //     size: 'small',
+  //     showGridlines: true,
+  //     stripedRows: true,
+  //     isLoading: true,
+  //     rowStyle: this.rowStyle,
+  //     rowClass: this.rowClass,
+  //     paginator: true,
+  //     rows: 5,
+  //     rowsPerPageOptions: [5, 10, 20],
+  //     globalFilterFields: ['id', 'code', 'name'],
+  //     showCurrentPageReport: true,
+  //     currentPageReportTemplate: '{first} - {last} of {totalRecords}',
+  //     lazy:true,
+  //     onLazyLoading:(event)=>{ this.simulateAPI(event)},
+  //   });
+
+  ngAfterViewInit(): void {
+      this.cols.set ( [
     { field: 'id', header: 'ID', sortable: false, filterable: false },
     { field: 'code', header: 'Code' },
     { field: 'name', header: 'Name' },
@@ -31,35 +66,37 @@ export class App {
       field: 'price',
       header: 'Price',
       filterType: 'numeric',
+      columnDesgin: this.customColumnDesign,
     },
-  ]);
+    ]);
+    this.tableConfig.set({
+      columns: this.cols,
+      value: this.products,
+      size: 'small',
+      showGridlines: true,
+      stripedRows: true,
+      isLoading: true,
+      rowStyle: this.rowStyle,
+      rowClass: this.rowClass,
+      paginator: true,
+      rows: 5,
+      rowsPerPageOptions: [5, 10, 20],
+      globalFilterFields: ['id', 'code', 'name'],
+      showCurrentPageReport: true,
+      currentPageReportTemplate: '{first} - {last} of {totalRecords}',
+      lazy:true,
+      onLazyLoading:(event)=>{ this.simulateAPI(event)},
+      sortType:'multiple',
+      clearFilters:true
+    })
+    }
   constructor() {
     setTimeout(() => {
       this.tableConfig.update(u=>({...u,isLoading:false}));
     }, 1000);
-    // setInterval(() => {
-    //   this.tableConfig.update(u=>({...u,first:( this.tableConfig().first || 0)+1}));
-    // }, 1000);
   }
 
-  tableConfig = signal<TableConfig>({
-    columns: this.cols,
-    value: this.products,
-    size: 'small',
-    showGridlines: true,
-    stripedRows: true,
-    isLoading: true,
-    rowStyle: this.rowStyle,
-    rowClass: this.rowClass,
-    paginator: true,
-    rows: 5,
-    rowsPerPageOptions: [5, 10, 20],
-    globalFilterFields: ['id', 'code', 'name'],
-    showCurrentPageReport: true,
-    currentPageReportTemplate: '{first} - {last} of {totalRecords}',
-    lazy:true,
-    onLazyLoading:(event)=>{ this.simulateAPI(event)}
-  })
+  
 
   rowClass(product: Product) {
     if (product.id === 4) return 'bg-primary text-primary-contrast';
@@ -67,11 +104,17 @@ export class App {
   }
 
   rowStyle(product: Product) {
-    if (product.id === 6) {
+    if (product.id === 2) {
       return { fontWeight: 'bold', fontStyle: 'italic' };
     }
     return {};
   }
+
+  colstyle(product: Product) {
+        if (product.price === 0) return 'danger';
+        else if (product.price > 0 && product.price < 400) return 'warn';
+        else return 'success';
+    }
 
 
 

@@ -6,6 +6,7 @@ export interface ColumnConfig {
   sortable?: boolean;
   filterable?: boolean;
   filterType?: 'text' | 'numeric' | 'boolean' | 'date' | 'custom';
+  columnDesgin?: TemplateRef<any>;
   // filterTemplate?: TemplateRef<any>;
 }
 

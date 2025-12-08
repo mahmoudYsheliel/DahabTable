@@ -1,6 +1,6 @@
 <p-table
   #dt
-  [columns]="_generatedTableConfig().columns"
+  [columns]="_generatedTableConfig().columns()"
   [value]="_generatedTableConfig().value || []"
   [loading]="_generatedTableConfig().isLoading"
   [size]="_generatedTableConfig().size"
@@ -15,6 +15,8 @@
   [lazy]="_generatedTableConfig().lazy"
   (onLazyLoad)="undefiendHandler(_generatedTableConfig().onLazyLoading,$event)"
   [totalRecords]="_generatedTableConfig().totalRecords || 0"
+  [sortMode]="_generatedTableConfig().sortType || 'single'"
+  [(selection)]="selectedProducts"
 >
   <!----------- Passed Sections ----------->
   @if (captionTemplate) {
@@ -50,7 +52,7 @@
 
   @if (!captionTemplate) {
   <ng-template #caption>
-    <app-caption [dt]="dt" />
+    <app-caption [dt]="dt" [clearFilter]="_generatedTableConfig().clearFilters" />
   </ng-template>
   }
 
@@ -58,7 +60,8 @@
   @if (!headerTemplate) {
   <ng-template #header>
     <tr>
-      @for (column of _generatedTableConfig().columns; track ($index + 'header')) {
+      <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
+      @for (column of _generatedTableConfig().columns(); track ($index + 'header')) {
       <th [pSortableColumn]="column.sortable ? column.field : undefined">
         <app-header [column]="column"></app-header>
         <!-- <ng-container [ngTemplateOutlet]="column.filterTemplate"></ng-container> -->
@@ -71,9 +74,23 @@
   @if (!bodyTemplate) {
   <ng-template #body let-product let-columns="columns">
     <tr [ngStyle]="product._sytle" [ngClass]="product._class">
+      <td>
+          <p-tableCheckbox [value]="product" />
+      </td>
       @for (col of columns; track ($index + 'body_col')) {
       <td>
-        <app-body [column]="col" [data]="product" />
+        @if (col.columnDesgin) {
+          
+          <!-- hna 3yzen ne3mel custom design hena -->
+          <!-- <ng-container [ngTemplateOutlet]="captionTemplate"></ng-container> -->
+           <!-- <ng-template #col.columnDesginName let-product>
+              <ng-container [ngTemplateOutlet]="col.columnDesginName" [ngTemplateOutletContext]="{ $implicit: product }"></ng-container>
+           </ng-template> -->
+            <ng-container [ngTemplateOutlet]="col.columnDesgin" [ngTemplateOutletContext]="{ $implicit: product}"></ng-container>
+          <!-- <p-badge [value]="product[col.field]" [severity]="product._colstyle" /> -->
+        } @else {
+          <app-body [column]="col" [data]="product" />
+        }
       </td>
       }
     </tr>

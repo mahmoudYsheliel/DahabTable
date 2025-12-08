@@ -1,4 +1,7 @@
 <div style="display: flex; flex-direction: row; justify-content: space-between">
+  @if(clearFilter()){
+    <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (click)="clear(dt)" />
+  }
   <p>Default Caption</p>
   <input
     pInputText

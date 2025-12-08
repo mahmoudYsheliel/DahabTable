@@ -18,6 +18,9 @@
       }
     </tr>
   </ng-template> -->
+  <ng-template #customColumnDesign let-product>
+      <p-badge [value]="product.price" [severity]="colstyle(product)" />
+  </ng-template>
 
   <ng-template #filter let-value let-filter="filterCallback">
     <p-select

@@ -8,6 +8,7 @@ import {
   signal,
   OnChanges,
   SimpleChanges,
+  input,
 } from '@angular/core';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
@@ -25,9 +26,13 @@ import { Footer } from '../table_components/footer/footer';
 import { Header } from '../table_components/header/header';
 import { Body } from '../table_components/body/body';
 import { getTableConfig } from '../../utils/table.interface';
+import { BadgeModule } from "primeng/badge";
+import { tab } from '@primeuix/themes/aura/tabs';
 
 @Component({
   selector: 'app-table',
+  // selector: 'table-checkbox-selection-demo',
+
   imports: [
     TableModule,
     TooltipModule,
@@ -45,18 +50,22 @@ import { getTableConfig } from '../../utils/table.interface';
     Body,
     NgStyle,
     NgClass,
-  ],
+    BadgeModule
+],
   templateUrl: './table.html',
   styleUrl: './table.css',
   host: { class: 'ignore-wrapper' },
 })
-export class Table implements OnChanges {
-  @Input() tableConfig: TableConfig = {};
+export class Table {
+   tableConfig = input.required<TableConfig>();
+      _generatedTableConfig = computed(() =>
+      ({ ...getTableConfig(this.tableConfig()) })
+    );
 
-  _generatedTableConfig = signal<TableConfig>(getTableConfig(this.tableConfig));
-  ngOnChanges(changes: SimpleChanges): void {
-    this._generatedTableConfig.update((u) => ({ ...u, ...this.tableConfig }));
-  }
+  selectedProducts!: any;
+
+
+
 
   @ContentChild('defaultHeader', { static: false }) defaultHeader?: TemplateRef<any>;
 
@@ -72,9 +81,9 @@ export class Table implements OnChanges {
     });
   }
   addAttributes() {
-    this.tableConfig.value?.forEach((v) => {
-      v._sytle = this.undefiendHandler(this.tableConfig.rowStyle, v);
-      v._class = this.undefiendHandler(this.tableConfig.rowClass, v);
+    this._generatedTableConfig().value?.forEach((v) => {
+      v._sytle = this.undefiendHandler(this._generatedTableConfig().rowStyle, v);
+      v._class = this.undefiendHandler(this._generatedTableConfig().rowClass, v);
     });
   }
   undefiendHandler(func: Function | undefined, input: any) {

@@ -1,8 +1,9 @@
 import { TableLazyLoadEvent } from 'primeng/table';
-import { ColumnConfig } from './column.interface';
+import { ColumnConfig, generateColumnConfig } from './column.interface';
+import { Signal, signal } from '@angular/core';
 
 export interface TableConfig<TInput = any> {
-  columns?: ColumnConfig[];
+  columns: Signal<ColumnConfig[]>;
   value?: any[];
   tableStyle?: Object;
   isLoading?:boolean;
@@ -22,13 +23,17 @@ export interface TableConfig<TInput = any> {
   totalRecords?:number;
   lazy?:boolean;
   onLazyLoading?:(input:TableLazyLoadEvent)=>void
+  sortType?: 'single' | 'multiple' | undefined;
+  clearFilters?:boolean;
 }
 
 
 export function getTableConfig(tableConfig:TableConfig):TableConfig{
+  let processedColumns = signal<ColumnConfig[]> (generateColumnConfig(tableConfig.columns()));
   return {
     first:0,
     lazy:false,
-    ...tableConfig
+    ...tableConfig,
+    columns: processedColumns,
   }
 }
