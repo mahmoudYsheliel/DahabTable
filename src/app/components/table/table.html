@@ -1,67 +1,90 @@
+
 <p-table
   #dt
-  [columns]="_generatedTableConfig().columns()"
-  [value]="_generatedTableConfig().value || []"
-  [loading]="_generatedTableConfig().isLoading"
-  [size]="_generatedTableConfig().size"
-  [showGridlines]="_generatedTableConfig().showGridlines"
-  [stripedRows]="_generatedTableConfig().stripedRows"
-  [paginator]="_generatedTableConfig().paginator"
-  [rows]="_generatedTableConfig().rows"
-  [first]="_generatedTableConfig().first"
-  [showCurrentPageReport]="_generatedTableConfig().showCurrentPageReport"
-  [currentPageReportTemplate]="_generatedTableConfig().currentPageReportTemplate || ''"
+  [dataKey]="generatedTC().dataKey"
+  [columns]="generatedTC().columns"
+  [value]="data() || []"
+  [loading]="generatedTC().isLoading"
+  [size]="generatedTC().size"
+  [showGridlines]="generatedTC().showGridlines"
+  [stripedRows]="generatedTC().stripedRows"
+  [paginator]="generatedTC().paginator"
+  [rows]="generatedTC().rows"
+  [first]="generatedTC().first"
+  [showCurrentPageReport]="generatedTC().showCurrentPageReport"
+  [currentPageReportTemplate]="generatedTC().currentPageReportTemplate || ''"
   [rowsPerPageOptions]="[5, 10, 20]"
-  [lazy]="_generatedTableConfig().lazy"
-  (onLazyLoad)="undefiendHandler(_generatedTableConfig().onLazyLoading,$event)"
-  [totalRecords]="_generatedTableConfig().totalRecords || 0"
-  [sortMode]="_generatedTableConfig().sortType || 'single'"
+  [lazy]="generatedTC().lazy"
+  (onLazyLoad)="undefiendHandler(generatedTC().onLazyLoading, $event)"
+  [totalRecords]="generatedTC().totalRecords || 0"
+  [sortMode]="generatedTC().sortType || 'single'"
   [(selection)]="selectedProducts"
+  (onRowSelect)="undefiendHandler(generatedTC().onRowSelect, $event)"
+  (onRowUnselect)="undefiendHandler(generatedTC().onRowUnselect, $event)"
+  [expandedRowKeys]="expandedRows()"
+  (onRowExpand)="undefiendHandler(generatedTC().onRowSelect, $event)"
+  (onRowCollapse)="undefiendHandler(generatedTC().onRowSelect, $event)"
 >
   <!----------- Passed Sections ----------->
-  @if (captionTemplate) {
+  @if (generatedTC().captionTemplate && generatedTC().showCaption) {
   <ng-template #caption>
-    <ng-container [ngTemplateOutlet]="captionTemplate"></ng-container>
+    <ng-container [ngTemplateOutlet]="generatedTC().captionTemplate"></ng-container>
   </ng-template>
 
-  } @if (headerTemplate) {
+  } @if (generatedTC().headerTemplate) {
   <ng-template #header>
     <ng-container
-      [ngTemplateOutlet]="headerTemplate"
-      [ngTemplateOutletContext]="{ $implicit: _generatedTableConfig().columns }"
+      [ngTemplateOutlet]="generatedTC().headerTemplate"
+      [ngTemplateOutletContext]="{ $implicit: generatedTC().columns }"
     ></ng-container>
   </ng-template>
 
-  } @if (bodyTemplate) {
+  } @if (generatedTC().bodyTemplate) {
   <ng-template #body let-product>
     <ng-container
-      [ngTemplateOutlet]="bodyTemplate"
-      [ngTemplateOutletContext]="{ $implicit: product, columns: _generatedTableConfig().columns }"
+      [ngTemplateOutlet]="generatedTC().bodyTemplate"
+      [ngTemplateOutletContext]="{ $implicit: product, columns: generatedTC().columns }"
     ></ng-container>
   </ng-template>
-  } @if (footerTemplate) {
+  } @if (generatedTC().footerTemplate && generatedTC().showFooter) {
   <ng-template #footer>
-    <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
+    <ng-container [ngTemplateOutlet]="generatedTC().footerTemplate"></ng-container>
   </ng-template>
 
+  }
+  @if (generatedTC().expandable && generatedTC().expandedRowTempelate) {
+      <ng-template #expandedrow let-product>
+        <tr>
+          <td colspan="50%">
+        <ng-container
+          [ngTemplateOutlet]="generatedTC().expandedRowTempelate"
+          [ngTemplateOutletContext]="{ $implicit: product }"
+        ></ng-container>      
+          </td>
+        </tr>
+      </ng-template>
   }
 
   <!----------- Defaul Sections ----------->
 
   <!-- Caption Section -->
 
-  @if (!captionTemplate) {
+  @if (!generatedTC().captionTemplate && generatedTC().showCaption) { 
   <ng-template #caption>
-    <app-caption [dt]="dt" [clearFilter]="_generatedTableConfig().clearFilters" />
+    <app-caption [dt]="dt" [clearFilter]="generatedTC().clearFilters" />
   </ng-template>
   }
 
   <!-- Header Section -->
-  @if (!headerTemplate) {
+  @if (!generatedTC().headerTemplate) {
   <ng-template #header>
     <tr>
+      
+      @if (generatedTC().expandable) {
+      <th style="width: 5rem"></th>
+      } @if (generatedTC().selectionMethod == 'checkbox') {
       <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
-      @for (column of _generatedTableConfig().columns(); track ($index + 'header')) {
+      } @for (column of generatedTC().columns; track ($index + 'header')) {
       <th [pSortableColumn]="column.sortable ? column.field : undefined">
         <app-header [column]="column"></app-header>
         <!-- <ng-container [ngTemplateOutlet]="column.filterTemplate"></ng-container> -->
@@ -71,25 +94,36 @@
   </ng-template>
   }
   <!-- Body Section -->
-  @if (!bodyTemplate) {
-  <ng-template #body let-product let-columns="columns">
-    <tr [ngStyle]="product._sytle" [ngClass]="product._class">
+  @if (!generatedTC().bodyTemplate) {
+  <ng-template #body let-product let-columns="columns" let-expanded="expanded">
+    <tr [ngStyle]="getStyle(product)" [ngClass]="getClass(product)">
+      @if (generatedTC().expandable) {
       <td>
-          <p-tableCheckbox [value]="product" />
+        <p-button
+          type="button"
+          pRipple
+          [pRowToggler]="product"
+          [text]="true"
+          severity="secondary"
+          [rounded]="true"
+          [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+        />
       </td>
-      @for (col of columns; track ($index + 'body_col')) {
+      } @if (generatedTC().selectionMethod == 'checkbox') {
+      <td>
+        <p-tableCheckbox [value]="product" />
+      </td>
+      } @for (col of columns; track ($index + 'body_col')) {
       <td>
         @if (col.columnDesgin) {
-          
-          <!-- hna 3yzen ne3mel custom design hena -->
-          <!-- <ng-container [ngTemplateOutlet]="captionTemplate"></ng-container> -->
-           <!-- <ng-template #col.columnDesginName let-product>
-              <ng-container [ngTemplateOutlet]="col.columnDesginName" [ngTemplateOutletContext]="{ $implicit: product }"></ng-container>
-           </ng-template> -->
-            <ng-container [ngTemplateOutlet]="col.columnDesgin" [ngTemplateOutletContext]="{ $implicit: product}"></ng-container>
-          <!-- <p-badge [value]="product[col.field]" [severity]="product._colstyle" /> -->
+
+        <ng-container
+          [ngTemplateOutlet]="col.columnDesgin"
+          [ngTemplateOutletContext]="{ $implicit: product }"
+        ></ng-container>
+
         } @else {
-          <app-body [column]="col" [data]="product" />
+        <app-body [column]="col" [data]="product" />
         }
       </td>
       }
@@ -98,7 +132,7 @@
   }
 
   <!-- Footer Section -->
-  @if (!footerTemplate) {
+  @if (!generatedTC().footerTemplate && generatedTC().showFooter) {
   <ng-template #footer>
     <tr>
       <td colSpan="100%">

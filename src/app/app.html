@@ -1,4 +1,4 @@
-<app-table [tableConfig]="tableConfig()">
+<app-table [tableConfig]="tableConfig()" [(data)]="products" [(selectedProducts)]="selectedRows">
   <!-- <ng-template #captionTemplate>
     <p>Passed Caption</p>
   </ng-template> -->
@@ -19,20 +19,19 @@
     </tr>
   </ng-template> -->
   <ng-template #customColumnDesign let-product>
-      <p-badge [value]="product.price" [severity]="colstyle(product)" />
+    <p-badge [value]="product.price" [severity]="colstyle(product)" />
   </ng-template>
 
-  <ng-template #filter let-value let-filter="filterCallback">
-    <p-select
-      [(ngModel)]="value.quantity"
-      (onChange)="filter($event.value)"
-      placeholder="Select One"
-      class="w-full"
+  <ng-template #rowExpanssionTemp let-item>
+    <app-table [tableConfig]="tableConfig().childTableConfig" [data]="item.subTable"> </app-table>
+  </ng-template>
+
+  <ng-template #subRowExpanssionTemp let-subItem>
+    <app-table
+      [tableConfig]="tableConfig().childTableConfig!.childTableConfig"
+      [data]="subItem.history"
     >
-      <ng-template let-option #item>
-        <p-tag [value]="option.value"></p-tag>
-      </ng-template>
-    </p-select>
+    </app-table>
   </ng-template>
 
   <!-- <ng-template #footerTemplate>
