@@ -4,6 +4,8 @@
   [aggregation]="generatedTC().aggregationFuncs">
 </app-footer>
 
+
+<p-toast position="top-right" /> 
 <p-table
   #dt
   [scrollable]="generatedTC().scrollable"
@@ -16,21 +18,31 @@
   [showGridlines]="generatedTC().showGridlines"
   [stripedRows]="generatedTC().stripedRows"
   [paginator]="generatedTC().paginator"
-  [rows]="generatedTC().rows"
+  [rows]="generatedTC().rows || generatedTC().rowsPerPageOptions?.[0] || 10"
+  [rowsPerPageOptions]="generatedTC().rowsPerPageOptions"
   [first]="generatedTC().first"
   [showCurrentPageReport]="generatedTC().showCurrentPageReport"
   [currentPageReportTemplate]="generatedTC().currentPageReportTemplate || ''"
-  [rowsPerPageOptions]="[5, 10, 20]"
   [lazy]="generatedTC().lazy"
   (onLazyLoad)="undefiendHandler(generatedTC().onLazyLoading, $event)"
   [totalRecords]="generatedTC().totalRecords || 0"
-  [sortMode]="generatedTC().sortType || 'single'"
+  [sortMode]="generatedTC().sortMode || 'single'"
   [(selection)]="selectedProducts"
   (onRowSelect)="undefiendHandler(generatedTC().onRowSelect, $event)"
   (onRowUnselect)="undefiendHandler(generatedTC().onRowUnselect, $event)"
   [expandedRowKeys]="expandedRows()"
   (onRowExpand)="undefiendHandler(generatedTC().onRowSelect, $event)"
   (onRowCollapse)="undefiendHandler(generatedTC().onRowSelect, $event)"
+  
+  [virtualScroll]="generatedTC().virtualScroll || false"
+  [virtualScrollItemSize]="generatedTC().virtualScrollItemSize || 40 "
+  [scrollHeight]="generatedTC().scrollHeight || '600px'"
+  [scrollable]="generatedTC().scrollable || false"
+
+  (onEditInit)="onEditInit($event)"
+  (onEditComplete)="onEditComplete($event)"
+
+  [reorderableColumns]="generatedTC().reorderableColumns || false"
   (onFilter)="undefiendHandler(generatedTC().onFilter, $event)"
   (onSort)="undefiendHandler(generatedTC().onSort, $event)"
   (onPage)="undefiendHandler(generatedTC().onPage, $event)"
@@ -90,11 +102,15 @@
   <ng-template #header>
     <tr>
       @if (generatedTC().expandable) {
-      <th></th>
-      } @if (generatedTC().selectionMethod == 'checkbox') {
-      <th><p-tableHeaderCheckbox /></th>
-      } @for (column of generatedTC().columns; track ($index + 'header')) {
-      <th [pSortableColumn]="column.sortable ? column.field : undefined">
+      <th style="width: 5rem" pFrozenColumn></th>
+      } 
+      @if (generatedTC().selectionMethod == 'checkbox') {
+      <th style="width: 4rem" pFrozenColumn><p-tableHeaderCheckbox /></th>
+      }@else if (generatedTC().selectionMethod == 'radiobutton') {
+      <th style="width: 4rem" pFrozenColumn></th>
+      } 
+      @for (column of generatedTC().columns; track ($index + 'header')) {
+      <th [pSortableColumn]="column.sortable ? column.field : undefined" pReorderableColumn="column.field">
         <app-header [column]="column"></app-header>
         <!-- <ng-container [ngTemplateOutlet]="column.filterTemplate"></ng-container> -->
       </th>
@@ -107,7 +123,7 @@
   <ng-template #body let-product let-columns="columns" let-expanded="expanded">
     <tr [ngStyle]="getStyle(product)" [ngClass]="getClass(product)">
       @if (generatedTC().expandable) {
-      <td>
+      <td pFrozenColumn>
         <p-button
           type="button"
           pRipple
@@ -119,21 +135,70 @@
         />
       </td>
       } @if (generatedTC().selectionMethod == 'checkbox') {
-      <td>
+      <td pFrozenColumn>
         <p-tableCheckbox [value]="product" />
       </td>
-      } @for (col of columns; track ($index + 'body_col')) {
-      <td>
-        @if (col.columnDesgin) {
-
-        <ng-container
-          [ngTemplateOutlet]="col.columnDesgin"
-          [ngTemplateOutletContext]="{ $implicit: product }"
-        ></ng-container>
-
-        } @else {
-        <app-body [column]="col" [data]="product" />
-        }
+      }@else if (generatedTC().selectionMethod == 'radiobutton') {
+      <td pFrozenColumn>
+        <p-tableRadioButton [value]="product" />
+      </td>
+      } 
+      @for (col of columns; track ($index + 'body_col')) {
+      
+      <td 
+        [pEditableColumn]="product" 
+        [pEditableColumnField]="col.field"
+        
+        >
+        
+        <!-- Condition 1 & 2: col.columnEditable = true -->
+        @if (col.columnEditable) {
+          <p-cellEditor>          
+            <!-- INPUT MODE -->
+            <ng-template pTemplate="input">
+              <!-- Condition 1: columnEditable=true + columnDesgin=true +
+               Condition 2: columnEditable=true + columnDesgin=false -->
+              <input
+                  pInputText
+                  type="col.dataType || 'text'"
+                  [value]="product[col.field]"
+                  [(ngModel)]="product[col.field]"
+                  fluid />
+            </ng-template>
+            
+            <!-- OUTPUT MODE (view mode when not editing) -->
+            <ng-template pTemplate="output">
+              <!-- Condition 1: columnEditable=true + columnDesgin=true -->
+              @if (col.columnDesgin) {
+                <ng-container
+                  [ngTemplateOutlet]="col.columnDesgin"
+                  [ngTemplateOutletContext]="{ $implicit: product, editing: false, col: col, onEdit: onEditComplete.bind(this) }">
+                </ng-container>
+              } 
+              <!-- Condition 2: columnEditable=true + columnDesgin=false -->
+              @else {
+                <app-body [column]="col" [data]="product" />
+              }
+              
+            </ng-template>
+            
+          </p-cellEditor>
+        } 
+        
+        <!-- Condition 3 & 4: col.columnEditable = false -->
+        @else {
+          <!-- Condition 3: columnEditable=false + columnDesgin=true -->
+          @if (col.columnDesgin) {
+            <ng-container
+              [ngTemplateOutlet]="col.columnDesgin"
+              [ngTemplateOutletContext]="{ $implicit: product, col: col }">
+            </ng-container>
+          } 
+          <!-- Condition 4: columnEditable=false + columnDesgin=false -->
+          @else {
+            <app-body [column]="col" [data]="product" />
+          }  
+        }     
       </td>
       }
     </tr>

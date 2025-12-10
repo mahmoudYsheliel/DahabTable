@@ -36,7 +36,7 @@ export class App {
 
   selectedRows = signal<any[]>([]);
   subTableConfig: TableConfig = { columns: [] };
-
+  subSubTableConfig: TableConfig = { columns: [] };
   agg = [
     [
       {
@@ -68,12 +68,18 @@ export class App {
     this.cols = [
       { field: 'id', header: 'ID', sortable: false, filterable: false },
       { field: 'code', header: 'Code' },
-      { field: 'name', header: 'Name' },
+      { field: 'name', header: 'Name',
+        columnEditable: true,
+        columnEditMethod: (event: any) => this.onCellEdit(event.data, event.field, event.newValue,event.oldValue),
+       },
       {
         field: 'price',
         header: 'Price',
         filterType: 'numeric',
         columnDesgin: this.customColumnDesign,
+        columnEditable: true,
+        columnEditMethod: (event: any) => this.onCellEdit(event.data, event.field, event.newValue, event.oldValue),
+        
       },
     ];
     this.subTableConfig = {
@@ -85,15 +91,17 @@ export class App {
         { field: 'amount', header: 'Amount', filterable: true, filterType: 'numeric' },
       ],
       expandable: true,
-      childTableConfig: {
-        size: 'small',
-        columns: [
+      expandedRowTempelate: this.subRowExpanssionTemp,
+    };
+    this.subSubTableConfig = {
+      size: 'small',
+      dataKey: 'subId',
+      columns: [
           { field: 'changedAt', header: 'Changed At' },
           { field: 'oldValue', header: 'Old Value' },
           { field: 'newValue', header: 'New Value' },
         ],
-      },
-      expandedRowTempelate: this.subRowExpanssionTemp,
+
     };
     this.tableConfig.set({
       dataKey: 'id',
@@ -105,8 +113,8 @@ export class App {
       rowStyle: this.rowStyle,
       rowClass: this.rowClass,
       paginator: true,
-      rows: 10,
-      rowsPerPageOptions: [5, 10, 20],
+      rows: 100,
+      rowsPerPageOptions: [5, 10, 20, 50, 100, 200],
       globalFilterFields: ['id', 'code', 'name'],
       showCurrentPageReport: true,
       currentPageReportTemplate: '{first} - {last} of {totalRecords}',
@@ -114,7 +122,7 @@ export class App {
       onLazyLoading: (event) => {
         this.simulateAPI(event);
       },
-      sortType: 'multiple',
+      sortMode: 'multiple',
       clearFilters: true,
       selectionMethod: 'checkbox',
       onRowSelect: (event: TableRowSelectEvent) => {
@@ -132,7 +140,7 @@ export class App {
       onExpansion: (event: any) => {
         console.log(event);
       },
-      childTableConfig: this.subTableConfig,
+      
       showCaption: true,
       showFooter: true,
 
@@ -151,20 +159,22 @@ export class App {
       },
 
       aggregationFuncs: this.agg,
+
+      reorderableColumns: true,
     });
   }
 
   constructor(private zone: NgZone) {
-    effect(() => {
-      const sel = this.selectedRows();
-      if (sel.length === 3) {
-        this.zone.runOutsideAngular(() => {
-          requestAnimationFrame(() => {
-            this.selectedRows.update((u) => [u[1], u[2]]);
-          });
-        });
-      }
-    });
+    // effect(() => {
+    //   const sel = this.selectedRows();
+    //   if (sel.length === 3) {
+    //     this.zone.runOutsideAngular(() => {
+    //       requestAnimationFrame(() => {
+    //         this.selectedRows.update((u) => [u[1], u[2]]);
+    //       });
+    //     });
+    //   }
+    // });
     setTimeout(() => {
       this.tableConfig.update((u) => ({ ...u, isLoading: false }));
     }, 1000);
@@ -269,5 +279,33 @@ export class App {
         return sum + prod.price;
       }, 0) / data.length
     );
+  }
+  onCellEdit(product: any, field: string, newValue: any, oldValue: any) {
+    // Validation example 1: Check if price is negative
+    if (field === 'price' && newValue < 0) {
+      return {
+        success: false,
+        message: 'Price cannot be negative!'
+      };
+    }
+
+    // Validation example 2: Check if name is too short
+    if (field === 'name' && newValue.length < 3) {
+      return {
+        success: false,
+        message: 'Product name must be at least 3 characters!'
+      };
+    }
+
+    // Update the value
+    product[field] = newValue;
+    
+    console.log(`Cell edited: ${field} = ${newValue} from ${oldValue}`, product);
+    
+    // Return success with custom message
+    return {
+      success: true,
+      message: `${field} successfully updated from "${oldValue}" to "${newValue}"`
+    };
   }
 }

@@ -23,12 +23,12 @@
   </ng-template>
 
   <ng-template #rowExpanssionTemp let-item>
-    <app-table [tableConfig]="tableConfig().childTableConfig" [data]="item.subTable"> </app-table>
+    <app-table [tableConfig]="subTableConfig" [data]="item.subTable"> </app-table>
   </ng-template>
 
   <ng-template #subRowExpanssionTemp let-subItem>
     <app-table
-      [tableConfig]="tableConfig().childTableConfig!.childTableConfig"
+      [tableConfig]="subSubTableConfig"
       [data]="subItem.history"
     >
     </app-table>

@@ -51,17 +51,16 @@ export interface TableConfig<TInput = any> {
   clearFilters?: boolean;
 
   // sorting
-  sortType?: 'single' | 'multiple';
+  sortMode?: 'single' | 'multiple';
   onSort?: (event:TreeTableSortEvent) => void;
 
   // selection
-  selectionMethod?: 'checkbox';
+  selectionMethod?: 'checkbox'| 'radiobutton';
   onRowSelect?: (event: TableRowSelectEvent) => void;
   onRowUnselect?: (event: TableRowUnSelectEvent<TInput>) => void;
 
   // expanded rows
   expandable?: boolean;
-  childTableConfig?: TableConfig;
   expandedRowTempelate?: TemplateRef<any>;
   onExpansion?: (event: TableRowExpandEvent) => void;
   onCollapse?: (event: TableRowCollapseEvent) => void;
@@ -82,6 +81,13 @@ export interface TableConfig<TInput = any> {
   showFooter?: boolean;
   footerTemplate?: TemplateRef<any>;
   paginationTemplate?: TemplateRef<any>;
+
+  // virtual scroll
+  virtualScroll?: boolean;
+  virtualScrollItemSize?: number;
+
+  // reorder columns
+  reorderableColumns?: boolean;
 }
 
 
