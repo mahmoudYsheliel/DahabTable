@@ -7,8 +7,9 @@ import {
   signal,
   input,
   model,
+  ViewChild,
 } from '@angular/core';
-import { TableModule } from 'primeng/table';
+import { TableModule,Table } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -42,18 +43,20 @@ import { BadgeModule } from 'primeng/badge';
     SelectModule,
     NgTemplateOutlet,
     Caption,
-    Footer,
     Header,
     Body,
     NgStyle,
     NgClass,
     BadgeModule,
+    Footer
   ],
   templateUrl: './table.html',
   styleUrl: './table.css',
   host: { class: 'ignore-wrapper' },
 })
-export class Table {
+export class DahabTable {
+  @ViewChild('dt') table!: Table;
+
   tableConfig = input<TableConfig>();
   data = model<any[]>([]);
   generatedTC = computed(() => ({ ...getTableConfig(this.tableConfig()) }));
@@ -64,7 +67,7 @@ export class Table {
   getClass(v: any) {
     return this.undefiendHandler(this.generatedTC().rowClass, v);
   }
-  getStyle(v:any) {
+  getStyle(v: any) {
     return this.undefiendHandler(this.generatedTC().rowStyle, v);
   }
   undefiendHandler(func: Function | undefined, input: any) {
@@ -73,4 +76,5 @@ export class Table {
     }
     return undefined;
   }
+  
 }

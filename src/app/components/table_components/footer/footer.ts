@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, input, TemplateRef, ViewChild } from '@angular/core';
+import { Table } from 'primeng/table';
+import { AggCell } from '../../../utils/table.interface';
 
 @Component({
   selector: 'app-footer',
@@ -7,5 +9,8 @@ import { Component } from '@angular/core';
   styleUrl: './footer.css',
 })
 export class Footer {
+  table = input.required<Table>();
+  aggregation = input<AggCell[][]>();
 
+  @ViewChild('footerTemplate', { static: true }) template!: TemplateRef<any>;
 }

@@ -1,12 +1,33 @@
 <div style="display: flex; flex-direction: row; justify-content: space-between">
-  @if(clearFilter()){
-    <p-button label="Clear" [outlined]="true" icon="pi pi-filter-slash" (click)="clear(dt)" />
-  }
-  <p>Default Caption</p>
+  <p-button [outlined]="true" icon="pi pi-filter" (click)="menu.toggle($event)" />
+
+  <p-popover #menu>
+    <div class="caption-filter-popover-container">
+      @for (field of fieldsVar(); track ($index + 'caption_filter')) {
+      <p-floatlabel variant="on">
+        <input pInputText [id]="'on_label_' + {$index}" [(ngModel)]="field.var" />
+        <label [for]="'on_label_' + {$index}"> {{ field.label }}</label>
+      </p-floatlabel>
+      }
+    </div>
+
+    <div class="caption-filter-action-container">
+      <p-button label="Clear" (click)="clear()" outlined />
+      <p-button label="Search" (click)="search()" />
+    </div>
+  </p-popover>
+
+  @for (field of appliedFilters(); track $index) { @if (field.var()) {
+  <p-chip>
+    <span> {{ field.label }} : {{ field.var() }} </span>
+    <i class="pi pi-times-circle" (click)="clearField(field.label)"></i>
+  </p-chip>
+  } }
+
   <input
     pInputText
     type="text"
-    (input)="dt.filterGlobal($event.target.value, 'contains')"
+    (input)="table().filterGlobal($event.target.value, 'contains')"
     placeholder="Search keyword"
   />
 </div>

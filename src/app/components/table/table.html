@@ -1,6 +1,13 @@
+<app-footer
+ #aggFooterTemplate
+  [table]="table"
+  [aggregation]="generatedTC().aggregationFuncs">
+</app-footer>
 
 <p-table
   #dt
+  [scrollable]="generatedTC().scrollable"
+  [scrollHeight]="generatedTC().scrollHeight"
   [dataKey]="generatedTC().dataKey"
   [columns]="generatedTC().columns"
   [value]="data() || []"
@@ -24,6 +31,10 @@
   [expandedRowKeys]="expandedRows()"
   (onRowExpand)="undefiendHandler(generatedTC().onRowSelect, $event)"
   (onRowCollapse)="undefiendHandler(generatedTC().onRowSelect, $event)"
+  (onFilter)="undefiendHandler(generatedTC().onFilter, $event)"
+  (onSort)="undefiendHandler(generatedTC().onSort, $event)"
+  (onPage)="undefiendHandler(generatedTC().onPage, $event)"
+  
 >
   <!----------- Passed Sections ----------->
   @if (generatedTC().captionTemplate && generatedTC().showCaption) {
@@ -51,27 +62,26 @@
     <ng-container [ngTemplateOutlet]="generatedTC().footerTemplate"></ng-container>
   </ng-template>
 
-  }
-  @if (generatedTC().expandable && generatedTC().expandedRowTempelate) {
-      <ng-template #expandedrow let-product>
-        <tr>
-          <td colspan="50%">
+  } @if (generatedTC().expandable && generatedTC().expandedRowTempelate) {
+  <ng-template #expandedrow let-product>
+    <tr>
+      <td colspan="50%">
         <ng-container
           [ngTemplateOutlet]="generatedTC().expandedRowTempelate"
           [ngTemplateOutletContext]="{ $implicit: product }"
-        ></ng-container>      
-          </td>
-        </tr>
-      </ng-template>
+        ></ng-container>
+      </td>
+    </tr>
+  </ng-template>
   }
 
   <!----------- Defaul Sections ----------->
 
   <!-- Caption Section -->
 
-  @if (!generatedTC().captionTemplate && generatedTC().showCaption) { 
+  @if (!generatedTC().captionTemplate && generatedTC().showCaption) {
   <ng-template #caption>
-    <app-caption [dt]="dt" [clearFilter]="generatedTC().clearFilters" />
+    <app-caption [table]="dt" [clearFilter]="generatedTC().clearFilters" />
   </ng-template>
   }
 
@@ -79,11 +89,10 @@
   @if (!generatedTC().headerTemplate) {
   <ng-template #header>
     <tr>
-      
       @if (generatedTC().expandable) {
-      <th style="width: 5rem"></th>
+      <th></th>
       } @if (generatedTC().selectionMethod == 'checkbox') {
-      <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
+      <th><p-tableHeaderCheckbox /></th>
       } @for (column of generatedTC().columns; track ($index + 'header')) {
       <th [pSortableColumn]="column.sortable ? column.field : undefined">
         <app-header [column]="column"></app-header>
@@ -132,13 +141,20 @@
   }
 
   <!-- Footer Section -->
+  <ng-template pTemplate="footer" let-columns>
+    
+    <ng-container [ngTemplateOutlet]="aggFooterTemplate.template"></ng-container>
+  </ng-template>
+
+
+
+
+
+  
   @if (!generatedTC().footerTemplate && generatedTC().showFooter) {
-  <ng-template #footer>
-    <tr>
-      <td colSpan="100%">
-        <app-footer />
-      </td>
-    </tr>
+  <ng-template pTemplate="footer" let-columns>
+    
+    <ng-container [ngTemplateOutlet]="aggFooterTemplate.template"></ng-container>
   </ng-template>
   }
 </p-table>

@@ -4,10 +4,19 @@ import {
   TableRowUnSelectEvent,
   TableRowExpandEvent,
   TableRowCollapseEvent,
+  TableFilterEvent,
+  TablePageEvent,
 } from 'primeng/table';
 import { ColumnConfig, generateColumnConfig } from './column.interface';
 import { Signal, signal, TemplateRef } from '@angular/core';
+import { TreeTableSortEvent } from 'primeng/treetable';
 
+
+type Func = (data:any[])=>any
+export interface AggCell {
+  colSpan:number,
+  func:Func
+}
 export interface TableConfig<TInput = any> {
   // data and structure fields
   dataKey?: string;
@@ -27,7 +36,7 @@ export interface TableConfig<TInput = any> {
   first?: number;
   showCurrentPageReport?: boolean;
   currentPageReportTemplate?: string;
-  onPage?: Function; // not working properly
+  onPage?: (event:TablePageEvent) => void; // not working properly
   rowsPerPageOptions?: number[];
   totalRecords?: number;
 
@@ -38,10 +47,12 @@ export interface TableConfig<TInput = any> {
 
   //filters
   globalFilterFields?: string[];
+  onFilter?: (event:TableFilterEvent) => void;
   clearFilters?: boolean;
 
   // sorting
   sortType?: 'single' | 'multiple';
+  onSort?: (event:TreeTableSortEvent) => void;
 
   // selection
   selectionMethod?: 'checkbox';
@@ -55,20 +66,29 @@ export interface TableConfig<TInput = any> {
   onExpansion?: (event: TableRowExpandEvent) => void;
   onCollapse?: (event: TableRowCollapseEvent) => void;
 
+  //scrolling
+  scrollable?: boolean;
+  scrollHeight?: string;
+
+
+  // aggregation
+  aggregationFuncs?: AggCell[][]; // array of fields and there colspans and functions
 
   // templates
-  showCaption?: boolean
+  showCaption?: boolean;
   captionTemplate?: TemplateRef<any>;
   headerTemplate?: TemplateRef<any>;
   bodyTemplate?: TemplateRef<any>;
-  showFooter?: boolean
+  showFooter?: boolean;
   footerTemplate?: TemplateRef<any>;
   paginationTemplate?: TemplateRef<any>;
 }
 
+
+
 export function getTableConfig(tableConfig: TableConfig | undefined): TableConfig | undefined {
-  if (!tableConfig) return
-  let processedColumns =generateColumnConfig(tableConfig.columns);
+  if (!tableConfig) return;
+  let processedColumns = generateColumnConfig(tableConfig.columns);
   return {
     first: 0,
     lazy: false,
