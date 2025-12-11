@@ -1,38 +1,48 @@
-import { Component, signal, ViewChild, effect, NgZone } from '@angular/core';
+import { Component, signal, ViewChild, effect, NgZone, computed } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { Product } from './utils/product.interface';
 import { generateProducts } from './utils/data_generator';
 import { DahabTable } from './components/table/table';
 import { ColumnConfig } from './utils/column.interface';
-import { TableConfig } from './utils/table.interface';
+import { AggCell, TableConfig } from './utils/table.interface';
 import { TemplateRef } from '@angular/core';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TableLazyLoadEvent } from 'primeng/table';
+import { Table, TableLazyLoadEvent } from 'primeng/table';
 import { BadgeModule } from 'primeng/badge';
 import { retrieveData } from './utils/simulate_api';
 
 @Component({
   selector: 'app-root',
-  imports: [ButtonModule, DahabTable, SelectModule, TagModule, CommonModule, FormsModule, BadgeModule],
+  imports: [
+    ButtonModule,
+    DahabTable,
+    SelectModule,
+    TagModule,
+    CommonModule,
+    FormsModule,
+    BadgeModule,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('DahabTable');
+  @ViewChild('dahabTable') table!: Table;
   products: Product[] = generateProducts(20);
-  data = signal(this.products)
-  @ViewChild('customColumnDesign', { static: true }) customColumnDesign!: TemplateRef<any>;
-  @ViewChild('customActionColumn', { static: true }) customActionColumn!: TemplateRef<any>;
-  @ViewChild('rowExpanssionTemp', { static: true }) rowExpanssionTemp!: TemplateRef<any>;
-  @ViewChild('subRowExpanssionTemp', { static: true }) subRowExpanssionTemp!: TemplateRef<any>;
+  data = signal(this.products);
+  @ViewChild('customColumnDesign', { static: true }) customColumnDesign?: TemplateRef<any>;
+  @ViewChild('customActionColumn', { static: true }) customActionColumn?: TemplateRef<any>;
+  @ViewChild('rowExpanssionTemp', { static: true }) rowExpanssionTemp?: TemplateRef<any>;
+  @ViewChild('subRowExpanssionTemp', { static: true }) subRowExpanssionTemp?: TemplateRef<any>;
 
   @ViewChild('captionTemplate', { static: false }) captionTemplate?: TemplateRef<any>;
   @ViewChild('headerTemplate', { static: false }) headerTemplate?: TemplateRef<any>;
   @ViewChild('bodyTemplate', { static: false }) bodyTemplate?: TemplateRef<any>;
   @ViewChild('footerTemplate', { static: false }) footerTemplate?: TemplateRef<any>;
+  @ViewChild('captionActionTemplate', { static: false }) captionActionTemplate?: TemplateRef<any>;
 
   cols: ColumnConfig[] = [];
   tableConfig = signal<TableConfig>({ columns: this.cols });
@@ -40,19 +50,26 @@ export class App {
   selectedRows = signal<any[]>([]);
   subTableConfig: TableConfig = { columns: [] };
   subSubTableConfig: TableConfig = { columns: [] };
-  agg = [
+  agg:AggCell[][] = [
     [
       {
         func: () => {
           return 'Sum';
         },
-        colSpan: 5,
+        colSpan: 3,
+        isFrozen:true,
+        alignFrozen:'left'
+      },
+      {
+        func:()=>{},
+        colSpan:2
       },
       {
         func: this.aggSum,
         colSpan: 2,
+        isFrozen:true,
+        alignFrozen: 'right'
       },
-    
     ],
 
     [
@@ -60,39 +77,53 @@ export class App {
         func: () => {
           return 'Av';
         },
-        colSpan: 5,
+        colSpan: 3,
+        isFrozen:true,
+        alignFrozen:'left'
+      },
+      {
+        func:()=>{},
+        colSpan:2
       },
       {
         func: this.aggAv,
         colSpan: 2,
+        isFrozen:true,
+        alignFrozen:'right'
       },
-      
     ],
   ];
   ngAfterViewInit(): void {
     this.cols = [
-      { field: 'id', header: 'ID', sortable: false, filterable: false },
+      { field: 'id', header: 'ID', sortable: false, filterable: false,isFrozen:true },
       { field: 'code', header: 'Code' },
-      { field: 'name', header: 'Name',
+      {
+        field: 'name',
+        header: 'Name',
         columnEditable: true,
-        columnEditMethod: (event: any) => this.onCellEdit(event.data, event.field, event.newValue,event.oldValue),
-       },
+        columnEditMethod: (event: any) =>
+          this.onCellEdit(event.data, event.field, event.newValue, event.oldValue),
+      },
       {
         field: 'price',
         header: 'Price',
         filterType: 'numeric',
         columnDesgin: this.customColumnDesign,
         columnEditable: true,
-        columnEditMethod: (event: any) => this.onCellEdit(event.data, event.field, event.newValue, event.oldValue),
-        
+        columnEditMethod: (event: any) =>
+          this.onCellEdit(event.data, event.field, event.newValue, event.oldValue),
+      isFrozen:true,
+      alignFrozen:'right'
       },
       {
-        field:'id',
-        header:'Action',
-        filterable:false,
-        sortable:false,
-        columnDesgin:this.customActionColumn
-      }
+        field: '',
+        header: 'Action',
+        filterable: false,
+        sortable: false,
+        columnDesgin: this.customActionColumn,
+        isFrozen:true,
+        alignFrozen:'right'
+      },
     ];
     this.subTableConfig = {
       size: 'small',
@@ -109,13 +140,13 @@ export class App {
       size: 'small',
       dataKey: 'subId',
       columns: [
-          { field: 'changedAt', header: 'Changed At' },
-          { field: 'oldValue', header: 'Old Value' },
-          { field: 'newValue', header: 'New Value' },
-        ],
-
+        { field: 'changedAt', header: 'Changed At' },
+        { field: 'oldValue', header: 'Old Value' },
+        { field: 'newValue', header: 'New Value' },
+      ],
     };
     this.tableConfig.set({
+      tableStyle:{'min-width':'800px'},
       dataKey: 'id',
       columns: this.cols,
       size: 'small',
@@ -127,7 +158,7 @@ export class App {
       paginator: true,
       rows: 100,
       rowsPerPageOptions: [5, 10, 20, 50, 100, 200],
-      globalFilterFields: ['id', 'code', 'name'],
+      
       showCurrentPageReport: true,
       currentPageReportTemplate: '{first} - {last} of {totalRecords}',
       lazy: false,
@@ -144,7 +175,7 @@ export class App {
       expandedRowTempelate: this.rowExpanssionTemp,
       onCollapse: this.logValue,
       onExpansion: this.logValue,
-      
+
       showCaption: true,
       showFooter: true,
 
@@ -153,11 +184,22 @@ export class App {
 
       onFilter: this.logValue,
       onSort: this.logValue,
-      onPage:this.logValue,
+      onPage: this.logValue,
 
       aggregationFuncs: this.agg,
 
       reorderableColumns: true,
+
+      captionTitle: 'Products',
+      showCaptionFilter: true,
+      showfilterChips: true,
+      showInputSearch:true,
+      globalFilterFields: ['id', 'code', 'name'],
+      captionActionTemplate: this.captionActionTemplate,
+
+      freezeExpansion:true,
+      freezeSelection:true,
+      
     });
   }
 
@@ -185,14 +227,12 @@ export class App {
     else return 'success';
   }
 
-
-
   simulateAPI(event: TableLazyLoadEvent) {
     console.log(event);
     const res = retrieveData(this.products, event);
     if (!res) return;
     const first = (res.page - 1) * res.size;
-    this.data.set(res.data)
+    this.data.set(res.data);
     this.tableConfig.update((u) => ({
       ...u,
       first,
@@ -220,7 +260,7 @@ export class App {
     if (field === 'price' && newValue < 0) {
       return {
         success: false,
-        message: 'Price cannot be negative!'
+        message: 'Price cannot be negative!',
       };
     }
 
@@ -228,23 +268,26 @@ export class App {
     if (field === 'name' && newValue.length < 3) {
       return {
         success: false,
-        message: 'Product name must be at least 3 characters!'
+        message: 'Product name must be at least 3 characters!',
       };
     }
 
     // Update the value
     product[field] = newValue;
-    
+
     console.log(`Cell edited: ${field} = ${newValue} from ${oldValue}`, product);
-    
+
     // Return success with custom message
     return {
       success: true,
-      message: `${field} successfully updated from "${oldValue}" to "${newValue}"`
+      message: `${field} successfully updated from "${oldValue}" to "${newValue}"`,
     };
   }
 
-  logValue(value:any){
-    console.log(value)
+  logValue(value: any) {
+    console.log(value);
+  }
+  logSelected() {
+    console.log(this.selectedRows());
   }
 }

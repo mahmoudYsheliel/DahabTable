@@ -1,4 +1,4 @@
-<app-table [tableConfig]="tableConfig()" [(data)]="data" [(selectedProducts)]="selectedRows">
+<app-table #dahabTable [tableConfig]="tableConfig()" [(data)]="data" [(selectedProducts)]="selectedRows">
   <!-- <ng-template #captionTemplate>
     <p>Passed Caption</p>
   </ng-template> -->
@@ -18,6 +18,10 @@
       }
     </tr>
   </ng-template> -->
+
+  <ng-template #captionActionTemplate>
+    <p-button  label="Log Selected" (click)="logSelected()" />
+  </ng-template>
   <ng-template #customColumnDesign let-product>
     <p-badge [value]="product.price" [severity]="colstyle(product)" />
   </ng-template>

@@ -1,10 +1,12 @@
 <p-toast position="top-right" />
+
 <p-table
   #dt
   [scrollable]="generatedTC().scrollable"
   [scrollHeight]="generatedTC().scrollHeight"
   [dataKey]="generatedTC().dataKey"
   [columns]="generatedTC().columns"
+  [tableStyle]="generatedTC().tableStyle"
   [value]="data() || []"
   [loading]="generatedTC().isLoading"
   [size]="generatedTC().size"
@@ -82,18 +84,28 @@
 
   @if (!generatedTC().captionTemplate && generatedTC().showCaption) {
   <ng-template #caption>
-    <app-caption [table]="table" />
+    <app-caption
+      [table]="table"
+      [actionTemplate]="generatedTC().captionActionTemplate"
+      [title]="generatedTC().captionTitle"
+      [showFilter]="generatedTC().showCaptionFilter"
+      [showFilterChips]="generatedTC().showfilterChips"
+      [globalFilterFields]="generatedTC().globalFilterFields"
+      [showInputSearch]="generatedTC().showInputSearch"
+    />
   </ng-template>
   }
 
   <!-- Header Section -->
 
-  @if (!generatedTC().headerTemplate)  {
+  @if (!generatedTC().headerTemplate) {
   <ng-template #header let-column>
     <app-header
       #appHeader
       [expandable]="generatedTC().expandable"
       [selectionMethod]="generatedTC().selectionMethod"
+      [freezeExpansion]="generatedTC().freezeExpansion"
+      [freezeSelection]="generatedTC().freezeSelection"
     ></app-header>
 
     <ng-container
@@ -113,6 +125,8 @@
       [rowClass]="generatedTC().rowClass"
       [rowStyle]="generatedTC().rowStyle"
       [selectionMethod]="generatedTC().selectionMethod"
+      [freezeExpansion]="generatedTC().freezeExpansion"
+      [freezeSelection]="generatedTC().freezeSelection"
     ></app-body>
 
     <ng-container

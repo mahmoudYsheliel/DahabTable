@@ -2,15 +2,18 @@
 <ng-template #template let-columns>
   <tr>
     @if (columns) { @if (expandable()) {
-    <th style="width: 5rem" pFrozenColumn></th>
+    <th style="width: 5rem" pFrozenColumn [frozen]="freezeExpansion() || false" ></th>
     } @if (selectionMethod() == 'checkbox') {
-    <th style="width: 4rem" pFrozenColumn><p-tableHeaderCheckbox /></th>
+    <th style="width: 4rem" pFrozenColumn [frozen]="freezeSelection() || false"><p-tableHeaderCheckbox /></th>
     }@else if (selectionMethod() == 'radiobutton') {
-    <th style="width: 4rem" pFrozenColumn></th>
+    <th style="width: 4rem" pFrozenColumn [frozen]="freezeSelection() || false"></th>
     } @for (column of columns; track ($index + 'header')) {
     <th
       [pSortableColumn]="column.sortable ? column.field : undefined"
       pReorderableColumn="column.field"
+      pFrozenColumn
+      [frozen]="column.isFrozen || false"
+      [alignFrozen]="column.alignFrozen"
     >
       <div style="display: flex; justify-content: space-between; align-items: center">
         <div>

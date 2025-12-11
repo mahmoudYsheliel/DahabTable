@@ -1,11 +1,11 @@
 <ng-template #footerTemplate let-columns>
   @for (row of aggregation(); track $index) {
-    <tr>
-      @for (cell of row; track $index) {
-        <td [colSpan]="cell.colSpan">
-          {{ cell.func(table().filteredValue || table().value) }}
-        </td>
-      }
-    </tr>
+  <tr>
+    @for (cell of row; track $index) {
+    <td [colSpan]="cell.colSpan" pFrozenColumn [frozen]="cell.isFrozen || false" [alignFrozen]="cell.alignFrozen || 'left'">
+     {{ cell.func(table().filteredValue || table().value) }}
+    </td>
+    }
+  </tr>
   }
 </ng-template>

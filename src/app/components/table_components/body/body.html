@@ -2,7 +2,7 @@
 
    <tr [ngStyle]="getStyle(product)" [ngClass]="getClass(product)">
       @if (expandable()) {
-      <td pFrozenColumn>
+      <td pFrozenColumn [frozen]="freezeExpansion() || false">
         <p-button
           [pRowToggler]="product"
           [text]="true"
@@ -10,16 +10,16 @@
         />
       </td>
       } @if (selectionMethod() == 'checkbox') {
-      <td pFrozenColumn>
+      <td pFrozenColumn  [frozen]="freezeSelection() || false">
         <p-tableCheckbox [value]="product" />
       </td>
       }@else if (selectionMethod() == 'radiobutton') {
-      <td pFrozenColumn>
+      <td pFrozenColumn  [frozen]="freezeSelection() || false">
         <p-tableRadioButton [value]="product" />
       </td>
       } @for (col of columns; track ($index + 'body_col')) {
 
-      <td [pEditableColumn]="product" [pEditableColumnField]="col.field">
+      <td [pEditableColumn]="product" [pEditableColumnField]="col.field" pFrozenColumn [frozen]="col.isFrozen || false" [alignFrozen]="col.alignFrozen">
         <!-- Condition 1 & 2: col.columnEditable = true -->
         @if (col.columnEditable) {
         <p-cellEditor>

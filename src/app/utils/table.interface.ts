@@ -16,6 +16,8 @@ type Func = (data:any[])=>any
 export interface AggCell {
   colSpan:number,
   func:Func
+  isFrozen?:boolean,
+  alignFrozen?: 'left' | 'right',
 }
 export interface TableConfig<TInput = any> {
   // data and structure fields
@@ -46,7 +48,6 @@ export interface TableConfig<TInput = any> {
   onLazyLoading?: (input: TableLazyLoadEvent) => void;
 
   //filters
-  globalFilterFields?: string[];
   onFilter?: (event:TableFilterEvent) => void;
   clearFilters?: boolean;
 
@@ -56,14 +57,16 @@ export interface TableConfig<TInput = any> {
 
   // selection
   selectionMethod?: 'checkbox'| 'radiobutton';
+  freezeSelection?:boolean;
   onRowSelect?: (event: TableRowSelectEvent) => void;
   onRowUnselect?: (event: TableRowUnSelectEvent<TInput>) => void;
 
   // expanded rows
   expandable?: boolean;
-  expandedRowTempelate?: TemplateRef<any> | null;
+  expandedRowTempelate?: TemplateRef<any>;
   onExpansion?: (event: TableRowExpandEvent) => void;
   onCollapse?: (event: TableRowCollapseEvent) => void;
+  freezeExpansion?:boolean;
 
   //scrolling
   scrollable?: boolean;
@@ -81,6 +84,15 @@ export interface TableConfig<TInput = any> {
   showFooter?: boolean;
   footerTemplate?: TemplateRef<any>;
   paginationTemplate?: TemplateRef<any>;
+
+  // caption configuration
+  captionTitle?:string;
+  showCaptionFilter?:boolean;
+  showfilterChips?:boolean;
+  showInputSearch?:boolean;
+  globalFilterFields?: string[];
+  captionActionTemplate?:TemplateRef<any>;
+  
 
   // virtual scroll
   virtualScroll?: boolean;

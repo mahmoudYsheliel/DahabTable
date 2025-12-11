@@ -21,6 +21,8 @@ export class Body {
   expandable = input<boolean>();
   columns= input<ColumnConfig[]>()
   selectionMethod = input<'checkbox' | 'radiobutton'>()
+  freezeExpansion = input<boolean>()
+  freezeSelection = input<boolean>()
   @ViewChild('template', { static: true }) template!: TemplateRef<any>;
 
   constructor(private messageService: MessageService, private cdr: ChangeDetectorRef) {}

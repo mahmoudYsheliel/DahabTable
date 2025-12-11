@@ -10,6 +10,8 @@ import { Table, TableModule } from 'primeng/table';
 export class Header {
   selectionMethod = input< 'checkbox' | 'radiobutton' >()
   expandable = input<boolean>()
+  freezeSelection = input<boolean>()
+  freezeExpansion = input<boolean>()
   @ViewChild('template', { static: true }) template!: TemplateRef<any>;
 
 }

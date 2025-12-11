@@ -1,4 +1,6 @@
 <div style="display: flex; flex-direction: row; justify-content: space-between">
+  <!-- filter section -->
+  @if (showFilter()) {
   <p-button [outlined]="true" icon="pi pi-filter" (click)="menu.toggle($event)" />
 
   <p-popover #menu>
@@ -16,18 +18,22 @@
       <p-button label="Search" (click)="search()" />
     </div>
   </p-popover>
-
-  @for (field of appliedFilters(); track $index) { @if (field.var()) {
+  } @if (title()) {
+  <p>{{ table().totalRecords }} {{ title() }}</p>
+  } @if (showFilterChips()) { @for (field of appliedFilters(); track $index) { @if (field.var()) {
   <p-chip>
     <span> {{ field.label }} : {{ field.var() }} </span>
     <i class="pi pi-times-circle" (click)="clearField(field.label)"></i>
   </p-chip>
-  } }
+  } } }
 
+  @if (showInputSearch()) {
   <input
     pInputText
     type="text"
     (input)="table().filterGlobal($event.target.value, 'contains')"
     placeholder="Search keyword"
   />
+  }
+  <ng-container [ngTemplateOutlet]="actionTemplate()"> </ng-container>
 </div>
