@@ -7,7 +7,7 @@ export interface ColumnConfig {
   sortable?: boolean;
   filterable?: boolean;
   filterType?: 'text' | 'numeric' | 'boolean' | 'date' | 'custom';
-  columnDesgin?: TemplateRef<any>;
+  columnDesgin?: TemplateRef<any> | null;
   columnEditable?: boolean;
   columnEditMethod?: (event: { data: any,  field: string, newValue: any, oldValue: any }) =>  { success: boolean, message: string } | void;
   // filterTemplate?: TemplateRef<any>;

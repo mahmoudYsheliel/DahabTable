@@ -8,7 +8,6 @@ import { Table, TableModule } from 'primeng/table';
   imports: [TableModule],
 })
 export class Header {
-  table = input.required<Table>();
   selectionMethod = input< 'checkbox' | 'radiobutton' >()
   expandable = input<boolean>()
   @ViewChild('template', { static: true }) template!: TemplateRef<any>;

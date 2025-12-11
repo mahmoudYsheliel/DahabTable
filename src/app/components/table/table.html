@@ -88,11 +88,10 @@
 
   <!-- Header Section -->
 
-  @if (!generatedTC().headerTemplate) {
+  @if (!generatedTC().headerTemplate)  {
   <ng-template #header let-column>
     <app-header
       #appHeader
-      [table]="table"
       [expandable]="generatedTC().expandable"
       [selectionMethod]="generatedTC().selectionMethod"
     ></app-header>
@@ -109,7 +108,6 @@
   <ng-template #body let-product let-columns="columns" let-expanded="expanded">
     <app-body
       #appBody
-      [table]="table"
       [expandable]="generatedTC().expandable"
       [columns]="generatedTC().columns"
       [rowClass]="generatedTC().rowClass"

@@ -61,7 +61,7 @@ export interface TableConfig<TInput = any> {
 
   // expanded rows
   expandable?: boolean;
-  expandedRowTempelate?: TemplateRef<any>;
+  expandedRowTempelate?: TemplateRef<any> | null;
   onExpansion?: (event: TableRowExpandEvent) => void;
   onCollapse?: (event: TableRowCollapseEvent) => void;
 

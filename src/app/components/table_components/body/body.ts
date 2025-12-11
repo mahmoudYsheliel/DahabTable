@@ -16,7 +16,6 @@ import { InputTextModule } from 'primeng/inputtext';
   providers:[MessageService]
 })
 export class Body {
-  table = input.required<Table>();
   rowClass = input<Function>();
   rowStyle = input<Function>();
   expandable = input<boolean>();
