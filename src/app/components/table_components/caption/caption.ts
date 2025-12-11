@@ -22,7 +22,6 @@ import { FormsModule } from '@angular/forms';
 })
 export class Caption {
   table = input.required<Table>();
-  clearFilter = input<boolean | undefined>();
   searchValue: string | undefined;
 
   fields = ['code', 'name', 'id'];

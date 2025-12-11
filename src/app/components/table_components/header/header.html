@@ -1,13 +1,33 @@
 
-<div style="display: flex; justify-content: space-between; align-items: center">
-  <div>
-    {{ column().header }}
-    @if(column().sortable){
-      <p-sortIcon [field]="column().field" />
-    }
-  </div>
-  @if (column().filterable) {
-      <p-columnFilter [type]="column().filterType || 'text' " [field]="column().field" display="menu"></p-columnFilter>
-  }
-</div>
-
+<ng-template #template let-columns>
+  <tr>
+    @if (columns) { @if (expandable()) {
+    <th style="width: 5rem" pFrozenColumn></th>
+    } @if (selectionMethod() == 'checkbox') {
+    <th style="width: 4rem" pFrozenColumn><p-tableHeaderCheckbox /></th>
+    }@else if (selectionMethod() == 'radiobutton') {
+    <th style="width: 4rem" pFrozenColumn></th>
+    } @for (column of columns; track ($index + 'header')) {
+    <th
+      [pSortableColumn]="column.sortable ? column.field : undefined"
+      pReorderableColumn="column.field"
+    >
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <div>
+          {{ column.header }}
+          @if(column.sortable){
+          <p-sortIcon [field]="column.field" />
+          }
+        </div>
+        @if (column.filterable) {
+        <p-columnFilter
+          [type]="column.filterType || 'text'"
+          [field]="column.field"
+          display="menu"
+        ></p-columnFilter>
+        }
+      </div>
+    </th>
+    } }
+  </tr>
+</ng-template>

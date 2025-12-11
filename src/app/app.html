@@ -1,4 +1,4 @@
-<app-table [tableConfig]="tableConfig()" [(data)]="products" [(selectedProducts)]="selectedRows">
+<app-table [tableConfig]="tableConfig()" [(data)]="data" [(selectedProducts)]="selectedRows">
   <!-- <ng-template #captionTemplate>
     <p>Passed Caption</p>
   </ng-template> -->
@@ -20,6 +20,9 @@
   </ng-template> -->
   <ng-template #customColumnDesign let-product>
     <p-badge [value]="product.price" [severity]="colstyle(product)" />
+  </ng-template>
+  <ng-template #customActionColumn let-product>
+    <p-button label="Log Value" (click)="logValue(product)" outlined />
   </ng-template>
 
   <ng-template #rowExpanssionTemp let-item>

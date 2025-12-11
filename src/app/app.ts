@@ -10,8 +10,9 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TableLazyLoadEvent, TableRowSelectEvent, TableRowUnSelectEvent } from 'primeng/table';
+import { TableLazyLoadEvent } from 'primeng/table';
 import { BadgeModule } from 'primeng/badge';
+import { retrieveData } from './utils/simulate_api';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +23,9 @@ import { BadgeModule } from 'primeng/badge';
 export class App {
   protected readonly title = signal('DahabTable');
   products: Product[] = generateProducts(20);
+  data = signal(this.products)
   @ViewChild('customColumnDesign', { static: true }) customColumnDesign!: TemplateRef<any>;
+  @ViewChild('customActionColumn', { static: true }) customActionColumn!: TemplateRef<any>;
   @ViewChild('rowExpanssionTemp', { static: true }) rowExpanssionTemp!: TemplateRef<any>;
   @ViewChild('subRowExpanssionTemp', { static: true }) subRowExpanssionTemp!: TemplateRef<any>;
 
@@ -47,8 +50,9 @@ export class App {
       },
       {
         func: this.aggSum,
-        colSpan: 1,
+        colSpan: 2,
       },
+    
     ],
 
     [
@@ -60,8 +64,9 @@ export class App {
       },
       {
         func: this.aggAv,
-        colSpan: 1,
+        colSpan: 2,
       },
+      
     ],
   ];
   ngAfterViewInit(): void {
@@ -81,6 +86,13 @@ export class App {
         columnEditMethod: (event: any) => this.onCellEdit(event.data, event.field, event.newValue, event.oldValue),
         
       },
+      {
+        field:'id',
+        header:'Action',
+        filterable:false,
+        sortable:false,
+        columnDesgin:this.customActionColumn
+      }
     ];
     this.subTableConfig = {
       size: 'small',
@@ -125,21 +137,13 @@ export class App {
       sortMode: 'multiple',
       clearFilters: true,
       selectionMethod: 'checkbox',
-      onRowSelect: (event: TableRowSelectEvent) => {
-        console.log(event);
-      },
-      onRowUnselect: (event: TableRowUnSelectEvent<Product>) => {
-        console.log(event);
-      },
+      onRowSelect: this.logValue,
+      onRowUnselect: this.logValue,
 
       expandable: true,
       expandedRowTempelate: this.rowExpanssionTemp,
-      onCollapse: (event: any) => {
-        console.log(event);
-      },
-      onExpansion: (event: any) => {
-        console.log(event);
-      },
+      onCollapse: this.logValue,
+      onExpansion: this.logValue,
       
       showCaption: true,
       showFooter: true,
@@ -147,16 +151,9 @@ export class App {
       scrollable: true,
       scrollHeight: '500px',
 
-      onFilter: (event: any) => {
-        event;
-        console.log(event);
-      },
-      onSort: (event: any) => {
-        console.log(event);
-      },
-      onPage: (event: any) => {
-        console.log(event);
-      },
+      onFilter: this.logValue,
+      onSort: this.logValue,
+      onPage:this.logValue,
 
       aggregationFuncs: this.agg,
 
@@ -164,17 +161,7 @@ export class App {
     });
   }
 
-  constructor(private zone: NgZone) {
-    // effect(() => {
-    //   const sel = this.selectedRows();
-    //   if (sel.length === 3) {
-    //     this.zone.runOutsideAngular(() => {
-    //       requestAnimationFrame(() => {
-    //         this.selectedRows.update((u) => [u[1], u[2]]);
-    //       });
-    //     });
-    //   }
-    // });
+  constructor() {
     setTimeout(() => {
       this.tableConfig.update((u) => ({ ...u, isLoading: false }));
     }, 1000);
@@ -198,70 +185,18 @@ export class App {
     else return 'success';
   }
 
-  retrieveData(data: any[] | undefined, rules: TableLazyLoadEvent) {
-    if (!data) return;
-    let result = [...data];
 
-    if (rules.filters) {
-      for (const field in rules.filters) {
-        const filterArr = rules.filters[field];
-        if (!Array.isArray(filterArr) || !filterArr.length) continue;
-
-        const { value } = filterArr[0];
-        if (value == null || value === '') continue;
-
-        const v = value.toString().toLowerCase();
-
-        result = result.filter((row) => {
-          const cell = row[field];
-          if (cell == null) return false;
-          return cell.toString().toLowerCase().includes(v);
-        });
-      }
-    }
-    if (typeof rules.sortField == 'string') {
-      const field = rules.sortField;
-      const order = rules.sortOrder ?? 1; // asc = 1, desc = -1
-
-      result.sort((a, b) => {
-        const x = a[field];
-        const y = b[field];
-
-        if (x == null && y != null) return -1 * order;
-        if (x != null && y == null) return 1 * order;
-
-        return x < y ? -1 * order : x > y ? 1 * order : 0;
-      });
-    }
-
-    const totalItems = result.length;
-    const size = rules.rows ?? totalItems;
-    const first = rules.first ?? 0;
-
-    const page = Math.floor(first / size) + 1; // convert offset → page number
-    const totalPages = Math.ceil(totalItems / size);
-
-    const pagedData = result.slice(first, first + size);
-
-    return {
-      data: pagedData,
-      page,
-      size,
-      totalPages,
-      totalItems,
-    };
-  }
 
   simulateAPI(event: TableLazyLoadEvent) {
     console.log(event);
-    const res = this.retrieveData(this.products, event);
+    const res = retrieveData(this.products, event);
     if (!res) return;
     const first = (res.page - 1) * res.size;
+    this.data.set(res.data)
     this.tableConfig.update((u) => ({
       ...u,
       first,
       rows: res.size,
-      value: res.data,
       totalRecords: res.totalItems,
     }));
   }
@@ -307,5 +242,9 @@ export class App {
       success: true,
       message: `${field} successfully updated from "${oldValue}" to "${newValue}"`
     };
+  }
+
+  logValue(value:any){
+    console.log(value)
   }
 }

@@ -1,11 +1,4 @@
-<app-footer
- #aggFooterTemplate
-  [table]="table"
-  [aggregation]="generatedTC().aggregationFuncs">
-</app-footer>
-
-
-<p-toast position="top-right" /> 
+<p-toast position="top-right" />
 <p-table
   #dt
   [scrollable]="generatedTC().scrollable"
@@ -33,20 +26,16 @@
   [expandedRowKeys]="expandedRows()"
   (onRowExpand)="undefiendHandler(generatedTC().onRowSelect, $event)"
   (onRowCollapse)="undefiendHandler(generatedTC().onRowSelect, $event)"
-  
   [virtualScroll]="generatedTC().virtualScroll || false"
-  [virtualScrollItemSize]="generatedTC().virtualScrollItemSize || 40 "
+  [virtualScrollItemSize]="generatedTC().virtualScrollItemSize || 40"
   [scrollHeight]="generatedTC().scrollHeight || '600px'"
   [scrollable]="generatedTC().scrollable || false"
-
   (onEditInit)="onEditInit($event)"
   (onEditComplete)="onEditComplete($event)"
-
   [reorderableColumns]="generatedTC().reorderableColumns || false"
   (onFilter)="undefiendHandler(generatedTC().onFilter, $event)"
   (onSort)="undefiendHandler(generatedTC().onSort, $event)"
   (onPage)="undefiendHandler(generatedTC().onPage, $event)"
-  
 >
   <!----------- Passed Sections ----------->
   @if (generatedTC().captionTemplate && generatedTC().showCaption) {
@@ -77,7 +66,7 @@
   } @if (generatedTC().expandable && generatedTC().expandedRowTempelate) {
   <ng-template #expandedrow let-product>
     <tr>
-      <td colspan="50%">
+      <td colspan="100%">
         <ng-container
           [ngTemplateOutlet]="generatedTC().expandedRowTempelate"
           [ngTemplateOutletContext]="{ $implicit: product }"
@@ -93,133 +82,55 @@
 
   @if (!generatedTC().captionTemplate && generatedTC().showCaption) {
   <ng-template #caption>
-    <app-caption [table]="dt" [clearFilter]="generatedTC().clearFilters" />
+    <app-caption [table]="table" />
   </ng-template>
   }
 
   <!-- Header Section -->
+
   @if (!generatedTC().headerTemplate) {
-  <ng-template #header>
-    <tr>
-      @if (generatedTC().expandable) {
-      <th style="width: 5rem" pFrozenColumn></th>
-      } 
-      @if (generatedTC().selectionMethod == 'checkbox') {
-      <th style="width: 4rem" pFrozenColumn><p-tableHeaderCheckbox /></th>
-      }@else if (generatedTC().selectionMethod == 'radiobutton') {
-      <th style="width: 4rem" pFrozenColumn></th>
-      } 
-      @for (column of generatedTC().columns; track ($index + 'header')) {
-      <th [pSortableColumn]="column.sortable ? column.field : undefined" pReorderableColumn="column.field">
-        <app-header [column]="column"></app-header>
-        <!-- <ng-container [ngTemplateOutlet]="column.filterTemplate"></ng-container> -->
-      </th>
-      }
-    </tr>
+  <ng-template #header let-column>
+    <app-header
+      #appHeader
+      [table]="table"
+      [expandable]="generatedTC().expandable"
+      [selectionMethod]="generatedTC().selectionMethod"
+    ></app-header>
+
+    <ng-container
+      [ngTemplateOutlet]="appHeader.template"
+      [ngTemplateOutletContext]="{ $implicit: column }"
+    ></ng-container>
   </ng-template>
   }
+
   <!-- Body Section -->
   @if (!generatedTC().bodyTemplate) {
   <ng-template #body let-product let-columns="columns" let-expanded="expanded">
-    <tr [ngStyle]="getStyle(product)" [ngClass]="getClass(product)">
-      @if (generatedTC().expandable) {
-      <td pFrozenColumn>
-        <p-button
-          type="button"
-          pRipple
-          [pRowToggler]="product"
-          [text]="true"
-          severity="secondary"
-          [rounded]="true"
-          [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-        />
-      </td>
-      } @if (generatedTC().selectionMethod == 'checkbox') {
-      <td pFrozenColumn>
-        <p-tableCheckbox [value]="product" />
-      </td>
-      }@else if (generatedTC().selectionMethod == 'radiobutton') {
-      <td pFrozenColumn>
-        <p-tableRadioButton [value]="product" />
-      </td>
-      } 
-      @for (col of columns; track ($index + 'body_col')) {
-      
-      <td 
-        [pEditableColumn]="product" 
-        [pEditableColumnField]="col.field"
-        
-        >
-        
-        <!-- Condition 1 & 2: col.columnEditable = true -->
-        @if (col.columnEditable) {
-          <p-cellEditor>          
-            <!-- INPUT MODE -->
-            <ng-template pTemplate="input">
-              <!-- Condition 1: columnEditable=true + columnDesgin=true +
-               Condition 2: columnEditable=true + columnDesgin=false -->
-              <input
-                  pInputText
-                  type="col.dataType || 'text'"
-                  [value]="product[col.field]"
-                  [(ngModel)]="product[col.field]"
-                  fluid />
-            </ng-template>
-            
-            <!-- OUTPUT MODE (view mode when not editing) -->
-            <ng-template pTemplate="output">
-              <!-- Condition 1: columnEditable=true + columnDesgin=true -->
-              @if (col.columnDesgin) {
-                <ng-container
-                  [ngTemplateOutlet]="col.columnDesgin"
-                  [ngTemplateOutletContext]="{ $implicit: product, editing: false, col: col, onEdit: onEditComplete.bind(this) }">
-                </ng-container>
-              } 
-              <!-- Condition 2: columnEditable=true + columnDesgin=false -->
-              @else {
-                <app-body [column]="col" [data]="product" />
-              }
-              
-            </ng-template>
-            
-          </p-cellEditor>
-        } 
-        
-        <!-- Condition 3 & 4: col.columnEditable = false -->
-        @else {
-          <!-- Condition 3: columnEditable=false + columnDesgin=true -->
-          @if (col.columnDesgin) {
-            <ng-container
-              [ngTemplateOutlet]="col.columnDesgin"
-              [ngTemplateOutletContext]="{ $implicit: product, col: col }">
-            </ng-container>
-          } 
-          <!-- Condition 4: columnEditable=false + columnDesgin=false -->
-          @else {
-            <app-body [column]="col" [data]="product" />
-          }  
-        }     
-      </td>
-      }
-    </tr>
+    <app-body
+      #appBody
+      [table]="table"
+      [expandable]="generatedTC().expandable"
+      [columns]="generatedTC().columns"
+      [rowClass]="generatedTC().rowClass"
+      [rowStyle]="generatedTC().rowStyle"
+      [selectionMethod]="generatedTC().selectionMethod"
+    ></app-body>
+
+    <ng-container
+      [ngTemplateOutlet]="appBody.template"
+      [ngTemplateOutletContext]="{ $implicit: product, columns, expanded }"
+    ></ng-container>
   </ng-template>
   }
 
   <!-- Footer Section -->
+
   <ng-template pTemplate="footer" let-columns>
-    
+    @if (!generatedTC().footerTemplate && generatedTC().showFooter) {
+    <app-footer #aggFooterTemplate [table]="table" [aggregation]="generatedTC().aggregationFuncs">
+    </app-footer>
     <ng-container [ngTemplateOutlet]="aggFooterTemplate.template"></ng-container>
+    }
   </ng-template>
-
-
-
-
-
-  
-  @if (!generatedTC().footerTemplate && generatedTC().showFooter) {
-  <ng-template pTemplate="footer" let-columns>
-    
-    <ng-container [ngTemplateOutlet]="aggFooterTemplate.template"></ng-container>
-  </ng-template>
-  }
 </p-table>

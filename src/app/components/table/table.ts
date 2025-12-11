@@ -10,7 +10,7 @@ import {
   ViewChild,
   ChangeDetectorRef,
 } from '@angular/core';
-import { TableModule,Table } from 'primeng/table';
+import { TableModule, Table } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -49,11 +49,9 @@ import { FormsModule } from '@angular/forms';
     Caption,
     Header,
     Body,
-    NgStyle,
-    NgClass,
     BadgeModule,
     FormsModule,
-    Footer
+    Footer,
   ],
   templateUrl: './table.html',
   styleUrl: './table.css',
@@ -70,8 +68,8 @@ export class DahabTable {
   selectedProducts = model<any[]>([]);
   expandedRows = model<Record<string, boolean>>({});
 
-  constructor(private messageService: MessageService, private cdr: ChangeDetectorRef) {}
-  
+  constructor(private messageService: MessageService) {}
+
   private editingValues = new Map<string, any>();
   onEditInit(event: any) {
     const { data, field } = event;
@@ -81,14 +79,14 @@ export class DahabTable {
 
   onEditComplete(event: any) {
     const { data, field } = event;
-    const col = this.generatedTC().columns?.find(c => c.field === field);
-    
+    const col = this.generatedTC().columns?.find((c) => c.field === field);
+
     if (!col) return;
 
     const key = `${data[this.generatedTC().dataKey || 'id']}-${field}`;
     const oldValue = this.editingValues.get(key);
     const newValue = data[field];
-    
+
     // Skip if no change
     if (oldValue === newValue) {
       this.editingValues.delete(key);
@@ -100,7 +98,7 @@ export class DahabTable {
     // ✅ Call custom method and get result
     if (col.columnEditMethod) {
       const methodResult = col.columnEditMethod({ data, field, newValue, oldValue });
-      
+
       // If method returns an object, use it
       if (methodResult && typeof methodResult === 'object') {
         result = methodResult;
@@ -110,48 +108,35 @@ export class DahabTable {
     // ✅ If validation failed, revert the value
     if (!result.success) {
       data[field] = oldValue; // Revert to old value
-      
-      setTimeout(() => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Update Failed',
-          detail: result.message || `${col.header || field} change was rejected`,
-          life: 3000
-        });
-        this.cdr.detectChanges();
-      }, 0);
-      
+
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Update Failed',
+        detail: result.message || `${col.header || field} change was rejected`,
+        life: 3000,
+      });
+
       this.editingValues.delete(key);
       return;
     }
 
     // ✅ If validation passed, show success message
-    setTimeout(() => {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Cell Updated',
-        detail: result.message || `${col.header || field} changed from "${oldValue}" to "${newValue}"`,
-        life: 3000
-      });
-      this.cdr.detectChanges();
-    }, 0);
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Cell Updated',
+      detail:
+        result.message || `${col.header || field} changed from "${oldValue}" to "${newValue}"`,
+      life: 3000,
+    });
 
     this.editingValues.delete(key);
   }
 
-
-
-  getClass(v: any) {
-    return this.undefiendHandler(this.generatedTC().rowClass, v);
-  }
-  getStyle(v: any) {
-    return this.undefiendHandler(this.generatedTC().rowStyle, v);
-  }
   undefiendHandler(func: Function | undefined, input: any) {
     if (func != undefined) {
       return func(input);
     }
     return undefined;
   }
-  
 }
