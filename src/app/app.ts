@@ -200,6 +200,34 @@ export class App {
       freezeExpansion:true,
       freezeSelection:true,
       
+      exportFilename: 'products',
+      exportButtons: {
+        csv: true,
+        excel: true,
+        pdf: true,
+      },
+
+      contextMenu: true,
+    contextMenuItems: (rowData: any) => [
+      {
+        label: 'View',
+        icon: 'pi pi-eye',
+        command: () => this.viewProduct(rowData) // ✅ Use rowData, not this.selectedRowForContextMenu
+      },
+      {
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: () => this.editProduct(rowData) // ✅ Use rowData
+      },
+      {
+        separator: true
+      },
+      {
+        label: 'Delete',
+        icon: 'pi pi-trash',
+        command: () => this.deleteProduct(rowData) // ✅ Use rowData
+      }
+    ],
     });
   }
 
@@ -289,5 +317,24 @@ export class App {
   }
   logSelected() {
     console.log(this.selectedRows());
+  }
+
+ // Add these methods to app.ts
+  viewProduct(product: any) {
+    console.log('View product:', product);
+    alert(`Viewing: ${product.name}`);
+  }
+
+  editProduct(product: any) {
+    console.log('Edit product:', product);
+    alert(`Editing: ${product.name}`);
+  }
+
+  deleteProduct(product: any) {
+    console.log('Delete product:', product);
+    if (confirm(`Delete ${product.name}?`)) {
+      // Your delete logic
+      console.log('Deleted:', product);
+    }
   }
 }

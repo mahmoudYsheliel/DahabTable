@@ -10,6 +10,7 @@ import {
 import { ColumnConfig, generateColumnConfig } from './column.interface';
 import { Signal, signal, TemplateRef } from '@angular/core';
 import { TreeTableSortEvent } from 'primeng/treetable';
+import { MenuItem } from 'primeng/api';
 
 
 type Func = (data:any[])=>any
@@ -100,6 +101,18 @@ export interface TableConfig<TInput = any> {
 
   // reorder columns
   reorderableColumns?: boolean;
+
+  // export options
+  exportFilename?: string;
+  exportButtons?: {
+    csv?: boolean;
+    excel?: boolean;
+    pdf?: boolean;
+  };
+
+  // context menu options
+  contextMenu?: boolean;
+  contextMenuItems?: MenuItem[] | ((rowData: any) => MenuItem[]);
 }
 
 

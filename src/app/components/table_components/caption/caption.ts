@@ -6,6 +6,7 @@ import {
   Input,
   signal,
   TemplateRef,
+  output,
 } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
@@ -15,6 +16,7 @@ import { PopoverModule } from 'primeng/popover';
 import { FloatLabel } from 'primeng/floatlabel';
 import { FormsModule } from '@angular/forms';
 import { NgTemplateOutlet } from '@angular/common';
+
 @Component({
   selector: 'app-caption',
   imports: [
@@ -38,6 +40,10 @@ export class Caption {
   showFilterChips = input<boolean>();
   showInputSearch = input<boolean>();
   globalFilterFields = input<string[]>();
+  
+  exportButtons = input<{ csv?: boolean; excel?: boolean; pdf?: boolean }>();
+  exportFilename = input<string>('export');
+  exportData = input<any[]>([]);
 
   searchValue: string | undefined;
 
@@ -83,9 +89,7 @@ export class Caption {
     if (this.appliedFilters() && this.fieldsVar()) {
       for (let field of this.appliedFilters()!) {
         field.var.set(
-          this.fieldsVar()!
-            .find((f) => f.label == field.label)
-            ?.var()
+          this.fieldsVar()!.find((f) => f.label == field.label)?.var()
         );
       }
     }
@@ -93,16 +97,92 @@ export class Caption {
 
   clearField(field: string) {
     if (this.fieldsVar()) {
-      this.fieldsVar()!
-        .find((f) => f.label == field)
-        ?.var.set('');
+      this.fieldsVar()!.find((f) => f.label == field)?.var.set('');
     }
 
     if (this.appliedFilters()) {
-      this.appliedFilters()!
-        .find((f) => f.label == field)
-        ?.var.set('');
+      this.appliedFilters()!.find((f) => f.label == field)?.var.set('');
       this.search();
     }
   }
+
+  // ✅ Export to CSV
+  exportCSV() {
+    this.table().exportCSV();
+  }
+
+  // ✅ Export to Excel
+  exportExcel() {
+    import('xlsx').then((xlsx) => {
+      const worksheet = xlsx.utils.json_to_sheet(this.exportData());
+      const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+      const excelBuffer: any = xlsx.write(workbook, {
+        bookType: 'xlsx',
+        type: 'array',
+      });
+      this.saveAsExcelFile(excelBuffer, this.exportFilename());
+    });
+  }
+
+  saveAsExcelFile(buffer: any, fileName: string): void {
+    import('file-saver').then((module) => {
+      if (module && module.default) {
+        let EXCEL_TYPE =
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+        let EXCEL_EXTENSION = '.xlsx';
+        const data: Blob = new Blob([buffer], {
+          type: EXCEL_TYPE,
+        });
+        module.default.saveAs(
+          data,
+          fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION
+        );
+      }
+    });
+  }
+
+  // ✅ FIXED: Export to PDF
+  exportPDF() {
+    Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable')
+    ]).then(([jsPDFModule, autoTableModule]) => {
+      try {
+        const jsPDF = jsPDFModule.default;
+        const autoTable = autoTableModule.default;
+        
+        const doc = new jsPDF();
+        
+        // Get columns from table
+        const columns = this.table().columns?.map((col: any) => col.header) || [];
+        const rows = this.exportData().map((item: any) => 
+          (this.table().columns || []).map((col: any) => item[col.field])
+        );
+
+        // Use autoTable function correctly
+        autoTable(doc, {
+          head: [columns],
+          body: rows,
+          startY: 20,
+          theme: 'grid',
+          styles: {
+            fontSize: 10,
+            cellPadding: 5,
+          },
+          headStyles: {
+            fillColor: [33, 128, 141], // Teal color
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+          }
+        });
+
+        doc.save(this.exportFilename() + '.pdf');
+      } catch (error) {
+        console.error('PDF export error:', error);
+      }
+    }).catch(error => {
+      console.error('Failed to load PDF libraries:', error);
+    });
+  }
+
 }

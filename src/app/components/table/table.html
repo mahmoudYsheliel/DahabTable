@@ -1,5 +1,13 @@
 <p-toast position="top-right" />
 
+@if (generatedTC().contextMenu) {
+  <p-contextmenu 
+    #cm 
+    [model]="contextMenuItems()" 
+    (onShow)="updateContextMenu()"
+    (onHide)="selectedRowForContextMenu = null"
+  />
+}
 <p-table
   #dt
   [scrollable]="generatedTC().scrollable"
@@ -38,6 +46,8 @@
   (onFilter)="undefiendHandler(generatedTC().onFilter, $event)"
   (onSort)="undefiendHandler(generatedTC().onSort, $event)"
   (onPage)="undefiendHandler(generatedTC().onPage, $event)"
+  [(contextMenuSelection)]="selectedRowForContextMenu"
+  [contextMenu]="cm"
 >
   <!----------- Passed Sections ----------->
   @if (generatedTC().captionTemplate && generatedTC().showCaption) {
@@ -92,6 +102,9 @@
       [showFilterChips]="generatedTC().showfilterChips"
       [globalFilterFields]="generatedTC().globalFilterFields"
       [showInputSearch]="generatedTC().showInputSearch"
+      [exportButtons]="generatedTC().exportButtons"
+      [exportFilename]="generatedTC().exportFilename || 'export'"
+      [exportData]="data()"
     />
   </ng-template>
   }

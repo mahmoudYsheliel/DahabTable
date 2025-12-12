@@ -1,9 +1,10 @@
 <ng-template #template let-product let-columns="columns" let-expanded="expanded" >
 
-   <tr [ngStyle]="getStyle(product)" [ngClass]="getClass(product)">
+   <tr [ngStyle]="getStyle(product)" [ngClass]="getClass(product)" [pContextMenuRow]="product">
       @if (expandable()) {
       <td pFrozenColumn [frozen]="freezeExpansion() || false">
         <p-button
+          
           [pRowToggler]="product"
           [text]="true"
           [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"

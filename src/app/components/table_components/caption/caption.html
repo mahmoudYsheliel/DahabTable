@@ -1,39 +1,90 @@
-<div style="display: flex; flex-direction: row; justify-content: space-between">
-  <!-- filter section -->
-  @if (showFilter()) {
-  <p-button [outlined]="true" icon="pi pi-filter" (click)="menu.toggle($event)" />
+<div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 1rem">
+  <!-- Left side: Filter and Title -->
+  <div style="display: flex; align-items: center; gap: 1rem">
+    @if (showFilter()) {
+    <p-button [outlined]="true" icon="pi pi-filter" (click)="menu.toggle($event)" />
 
-  <p-popover #menu>
-    <div class="caption-filter-popover-container">
-      @for (field of fieldsVar(); track ($index + 'caption_filter')) {
-      <p-floatlabel variant="on">
-        <input pInputText [id]="'on_label_' + {$index}" [(ngModel)]="field.var" />
-        <label [for]="'on_label_' + {$index}"> {{ field.label }}</label>
-      </p-floatlabel>
-      }
-    </div>
+    <p-popover #menu>
+      <div class="caption-filter-popover-container">
+        @for (field of fieldsVar(); track ($index + 'caption_filter')) {
+        <p-floatlabel variant="on">
+          <input pInputText [id]="'on_label_' + $index" [(ngModel)]="field.var" />
+          <label [for]="'on_label_' + $index"> {{ field.label }}</label>
+        </p-floatlabel>
+        }
+      </div>
 
-    <div class="caption-filter-action-container">
-      <p-button label="Clear" (click)="clear()" outlined />
-      <p-button label="Search" (click)="search()" />
-    </div>
-  </p-popover>
-  } @if (title()) {
-  <p>{{ table().totalRecords }} {{ title() }}</p>
-  } @if (showFilterChips()) { @for (field of appliedFilters(); track $index) { @if (field.var()) {
-  <p-chip>
-    <span> {{ field.label }} : {{ field.var() }} </span>
-    <i class="pi pi-times-circle" (click)="clearField(field.label)"></i>
-  </p-chip>
-  } } }
+      <div class="caption-filter-action-container">
+        <p-button label="Clear" (click)="clear()" outlined />
+        <p-button label="Search" (click)="search()" />
+      </div>
+    </p-popover>
+    } 
+    
+    @if (title()) {
+    <p style="margin: 0">{{ table().totalRecords }} {{ title() }}</p>
+    }
+  </div>
 
-  @if (showInputSearch()) {
-  <input
-    pInputText
-    type="text"
-    (input)="table().filterGlobal($event.target.value, 'contains')"
-    placeholder="Search keyword"
-  />
-  }
-  <ng-container [ngTemplateOutlet]="actionTemplate()"> </ng-container>
+  <!-- Middle: Filter Chips -->
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap">
+    @if (showFilterChips()) { 
+      @for (field of appliedFilters(); track $index) { 
+        @if (field.var()) {
+          <p-chip>
+            <span> {{ field.label }} : {{ field.var() }} </span>
+            <i class="pi pi-times-circle" (click)="clearField(field.label)"></i>
+          </p-chip>
+        } 
+      } 
+    }
+  </div>
+
+  <!-- Right side: Search and Export Buttons -->
+  <div style="display: flex; align-items: center; gap: 0.5rem">
+    @if (showInputSearch()) {
+    <input
+      pInputText
+      type="text"
+      [(ngModel)]="searchValue"
+      (input)="table().filterGlobal(searchValue, 'contains')"
+      placeholder="Search keyword"
+    />
+    }
+    
+    <!-- ✅ Export Buttons - now calling local methods -->
+    @if (exportButtons()) {
+      <div style="display: flex; gap: 0.5rem">
+        @if (exportButtons()?.csv) {
+          <p-button 
+            icon="pi pi-file" 
+            [outlined]="true"
+            severity="secondary"
+            size="small"
+            pTooltip="Export CSV"
+            (onClick)="exportCSV()" />
+        }
+        @if (exportButtons()?.excel) {
+          <p-button 
+            icon="pi pi-file-excel" 
+            [outlined]="true"
+            severity="success"
+            size="small"
+            pTooltip="Export Excel"
+            (onClick)="exportExcel()" />
+        }
+        @if (exportButtons()?.pdf) {
+          <p-button 
+            icon="pi pi-file-pdf" 
+            [outlined]="true"
+            severity="danger"
+            size="small"
+            pTooltip="Export PDF"
+            (onClick)="exportPDF()" />
+        }
+      </div>
+    }
+    
+    <ng-container [ngTemplateOutlet]="actionTemplate()"></ng-container>
+  </div>
 </div>

@@ -1,14 +1,10 @@
 import {
   Component,
-  TemplateRef,
-  ContentChild,
-  effect,
   computed,
   signal,
   input,
   model,
   ViewChild,
-  ChangeDetectorRef,
 } from '@angular/core';
 import { TableModule, Table } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
@@ -20,21 +16,19 @@ import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { SelectModule } from 'primeng/select';
 import { TableConfig } from '../../utils/table.interface';
-import { NgTemplateOutlet, NgStyle, NgClass } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { Caption } from '../table_components/caption/caption';
 import { Footer } from '../table_components/footer/footer';
 import { Header } from '../table_components/header/header';
 import { Body } from '../table_components/body/body';
 import { getTableConfig } from '../../utils/table.interface';
 import { BadgeModule } from 'primeng/badge';
-import { MessageService } from 'primeng/api';
-import { ColumnConfig } from '../../utils/column.interface';
+import { MessageService, MenuItem } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
+import { ContextMenuModule, ContextMenu  } from 'primeng/contextmenu';
 
 @Component({
   selector: 'app-table',
-  // selector: 'table-checkbox-selection-demo',
-
   imports: [
     TableModule,
     TooltipModule,
@@ -52,6 +46,7 @@ import { FormsModule } from '@angular/forms';
     BadgeModule,
     FormsModule,
     Footer,
+    ContextMenuModule,
   ],
   templateUrl: './table.html',
   styleUrl: './table.css',
@@ -60,6 +55,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class DahabTable {
   @ViewChild('dt') table!: Table;
+  @ViewChild('cm') cm!: ContextMenu;
 
   tableConfig = input<TableConfig>();
   data = model<any[]>([]);
@@ -67,10 +63,15 @@ export class DahabTable {
 
   selectedProducts = model<any[]>([]);
   expandedRows = model<Record<string, boolean>>({});
+  
+  
+  selectedRowForContextMenu: any = null;
+  contextMenuItems = signal<MenuItem[]>([]);
 
   constructor(private messageService: MessageService) {}
 
   private editingValues = new Map<string, any>();
+  
   onEditInit(event: any) {
     const { data, field } = event;
     const key = `${data[this.generatedTC().dataKey || 'id']}-${field}`;
@@ -87,7 +88,6 @@ export class DahabTable {
     const oldValue = this.editingValues.get(key);
     const newValue = data[field];
 
-    // Skip if no change
     if (oldValue === newValue) {
       this.editingValues.delete(key);
       return;
@@ -95,19 +95,16 @@ export class DahabTable {
 
     let result = { success: true, message: '' };
 
-    // ✅ Call custom method and get result
     if (col.columnEditMethod) {
       const methodResult = col.columnEditMethod({ data, field, newValue, oldValue });
 
-      // If method returns an object, use it
       if (methodResult && typeof methodResult === 'object') {
         result = methodResult;
       }
     }
 
-    // ✅ If validation failed, revert the value
     if (!result.success) {
-      data[field] = oldValue; // Revert to old value
+      data[field] = oldValue;
 
       this.messageService.add({
         severity: 'error',
@@ -120,8 +117,6 @@ export class DahabTable {
       return;
     }
 
-    // ✅ If validation passed, show success message
-
     this.messageService.add({
       severity: 'success',
       summary: 'Cell Updated',
@@ -131,6 +126,22 @@ export class DahabTable {
     });
 
     this.editingValues.delete(key);
+  }
+
+  // ✅ Add method to update menu when row is selected
+  updateContextMenu() {
+    const config = this.generatedTC();
+    if (!config.contextMenuItems || !this.selectedRowForContextMenu) {
+      this.contextMenuItems.set([]);
+      return;
+    }
+    
+    if (typeof config.contextMenuItems === 'function') {
+      const items = config.contextMenuItems(this.selectedRowForContextMenu);
+      this.contextMenuItems.set(items);
+    } else {
+      this.contextMenuItems.set(config.contextMenuItems);
+    }
   }
 
   undefiendHandler(func: Function | undefined, input: any) {
