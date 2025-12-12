@@ -1,11 +1,4 @@
-import {
-  Component,
-  computed,
-  signal,
-  input,
-  model,
-  ViewChild,
-} from '@angular/core';
+import { Component, computed, signal, input, model, ViewChild } from '@angular/core';
 import { TableModule, Table } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
@@ -23,9 +16,9 @@ import { Header } from '../table_components/header/header';
 import { Body } from '../table_components/body/body';
 import { getTableConfig } from '../../utils/table.interface';
 import { BadgeModule } from 'primeng/badge';
-import { MessageService, MenuItem } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
-import { ContextMenuModule, ContextMenu  } from 'primeng/contextmenu';
+import { ContextMenuModule, ContextMenu } from 'primeng/contextmenu';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-table',
@@ -51,27 +44,30 @@ import { ContextMenuModule, ContextMenu  } from 'primeng/contextmenu';
   templateUrl: './table.html',
   styleUrl: './table.css',
   host: { class: 'ignore-wrapper' },
-  providers: [MessageService],
 })
 export class DahabTable {
   @ViewChild('dt') table!: Table;
   @ViewChild('cm') cm!: ContextMenu;
 
+  // table config and data
   tableConfig = input<TableConfig>();
   data = model<any[]>([]);
-  generatedTC = computed(() => ({ ...getTableConfig(this.tableConfig()) }));
 
+  //selected and expanded rows
   selectedProducts = model<any[]>([]);
   expandedRows = model<Record<string, boolean>>({});
-  
-  
+
+  // table config with default values to be used later
+  generatedTC = computed(() => ({ ...getTableConfig(this.tableConfig()) }));
+
+  // context menu properities
   selectedRowForContextMenu: any = null;
   contextMenuItems = signal<MenuItem[]>([]);
 
-  constructor(private messageService: MessageService) {}
-
+  // map holding old values for edited cells to undo edits
   private editingValues = new Map<string, any>();
-  
+
+
   onEditInit(event: any) {
     const { data, field } = event;
     const key = `${data[this.generatedTC().dataKey || 'id']}-${field}`;
@@ -88,60 +84,21 @@ export class DahabTable {
     const oldValue = this.editingValues.get(key);
     const newValue = data[field];
 
-    if (oldValue === newValue) {
-      this.editingValues.delete(key);
-      return;
+    if (oldValue !== newValue && col.columnEditMethod) {
+       col.columnEditMethod({ data, newValue, oldValue });
     }
-
-    let result = { success: true, message: '' };
-
-    if (col.columnEditMethod) {
-      const methodResult = col.columnEditMethod({ data, field, newValue, oldValue });
-
-      if (methodResult && typeof methodResult === 'object') {
-        result = methodResult;
-      }
-    }
-
-    if (!result.success) {
-      data[field] = oldValue;
-
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Update Failed',
-        detail: result.message || `${col.header || field} change was rejected`,
-        life: 3000,
-      });
-
-      this.editingValues.delete(key);
-      return;
-    }
-
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Cell Updated',
-      detail:
-        result.message || `${col.header || field} changed from "${oldValue}" to "${newValue}"`,
-      life: 3000,
-    });
 
     this.editingValues.delete(key);
   }
 
-  // ✅ Add method to update menu when row is selected
   updateContextMenu() {
-    const config = this.generatedTC();
-    if (!config.contextMenuItems || !this.selectedRowForContextMenu) {
+    if (!this.generatedTC().contextMenuItems || !this.selectedRowForContextMenu) {
       this.contextMenuItems.set([]);
       return;
     }
-    
-    if (typeof config.contextMenuItems === 'function') {
-      const items = config.contextMenuItems(this.selectedRowForContextMenu);
-      this.contextMenuItems.set(items);
-    } else {
-      this.contextMenuItems.set(config.contextMenuItems);
-    }
+
+    const items = this.generatedTC().contextMenuItems!(this.selectedRowForContextMenu);
+    this.contextMenuItems.set(items);
   }
 
   undefiendHandler(func: Function | undefined, input: any) {

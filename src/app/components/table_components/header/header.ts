@@ -1,7 +1,6 @@
 // app-header.component.ts
 import { Component, input, TemplateRef, ViewChild } from '@angular/core';
 import { Table, TableModule } from 'primeng/table';
-
 @Component({
   selector: 'app-header',
   templateUrl: './header.html',
@@ -14,4 +13,5 @@ export class Header {
   freezeExpansion = input<boolean>()
   @ViewChild('template', { static: true }) template!: TemplateRef<any>;
 
+  
 }

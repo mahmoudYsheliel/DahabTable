@@ -1,17 +1,21 @@
 import { TemplateRef } from '@angular/core';
-import { CellEditor } from 'primeng/table';
+import { AlignFrozenDirection, TableEditCellFunc, TableFilterType } from './tpyes';
+
 
 export interface ColumnConfig {
   field: string;
   header: string;
   sortable?: boolean;
   filterable?: boolean;
-  filterType?: 'text' | 'numeric' | 'boolean' | 'date' | 'custom';
+  filterType?: TableFilterType;
   columnDesgin?: TemplateRef<any>;
   columnEditable?: boolean;
-  columnEditMethod?: (event: { data: any,  field: string, newValue: any, oldValue: any }) =>  { success: boolean, message: string } | void;
+  columnEditMethod?: TableEditCellFunc;
   isFrozen?:boolean;
-  alignFrozen?: 'left' | 'right';
+  alignFrozen?: AlignFrozenDirection;
+  columnStyle?: object;
+  columnClass?: string;
+  tooltip?:(rowData:any)=>void
   // filterTemplate?: TemplateRef<any>;
 }
 

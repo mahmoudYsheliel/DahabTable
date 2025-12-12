@@ -1,79 +1,89 @@
-<ng-template #template let-product let-columns="columns" let-expanded="expanded" >
+<ng-template #template let-product let-columns="columns" let-expanded="expanded">
+  <tr [ngStyle]="getStyle(product)" [ngClass]="getClass(product)" [pContextMenuRow]="product">
+    @if (expandable()) {
+    <td pFrozenColumn [frozen]="freezeExpansion() || false">
+      <p-button
+        [pRowToggler]="product"
+        [text]="true"
+        [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+      />
+    </td>
+    } @if (selectionMethod() == 'checkbox') {
+    <td pFrozenColumn [frozen]="freezeSelection() || false">
+      <p-tableCheckbox [value]="product" />
+    </td>
+    }@else if (selectionMethod() == 'radiobutton') {
+    <td pFrozenColumn [frozen]="freezeSelection() || false">
+      <p-tableRadioButton [value]="product" />
+    </td>
+    } @for (col of columns; track ($index + 'body_col')) {
 
-   <tr [ngStyle]="getStyle(product)" [ngClass]="getClass(product)" [pContextMenuRow]="product">
-      @if (expandable()) {
-      <td pFrozenColumn [frozen]="freezeExpansion() || false">
-        <p-button
-          
-          [pRowToggler]="product"
-          [text]="true"
-          [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-        />
-      </td>
-      } @if (selectionMethod() == 'checkbox') {
-      <td pFrozenColumn  [frozen]="freezeSelection() || false">
-        <p-tableCheckbox [value]="product" />
-      </td>
-      }@else if (selectionMethod() == 'radiobutton') {
-      <td pFrozenColumn  [frozen]="freezeSelection() || false">
-        <p-tableRadioButton [value]="product" />
-      </td>
-      } @for (col of columns; track ($index + 'body_col')) {
-
-      <td [pEditableColumn]="product" [pEditableColumnField]="col.field" pFrozenColumn [frozen]="col.isFrozen || false" [alignFrozen]="col.alignFrozen">
-        <!-- Condition 1 & 2: col.columnEditable = true -->
-        @if (col.columnEditable) {
-        <p-cellEditor>
-          <!-- INPUT MODE -->
-          <ng-template pTemplate="input">
-            <!-- Condition 1: columnEditable=true + columnDesgin=true +
+    <td
+      [pEditableColumn]="product"
+      [pEditableColumnField]="col.field"
+      pFrozenColumn
+      [frozen]="col.isFrozen || false"
+      [alignFrozen]="col.alignFrozen"
+      [ngClass]="col.columnClass"
+      [pTooltip]="
+        (cellErrors[product.id] ? cellErrors[product.id][col.field] : '') ||
+        undefiendHandler(col.tooltip, product)
+      "
+    >
+      <!-- Condition 1 & 2: col.columnEditable = true -->
+      @if (col.columnEditable) {
+      <p-cellEditor>
+        <!-- INPUT MODE -->
+        <ng-template pTemplate="input">
+          <!-- Condition 1: columnEditable=true + columnDesgin=true +
                Condition 2: columnEditable=true + columnDesgin=false -->
-            <input
-              pInputText
-              type="col.dataType || 'text'"
-              [value]="product[col.field]"
-              [(ngModel)]="product[col.field]"
-              fluid
-            />
-          </ng-template>
+          <input
+            pInputText
+            type="col.dataType || 'text'"
+            [value]="product[col.field]"
+            [(ngModel)]="product[col.field]"
+            fluid
+          />
+        </ng-template>
 
-          <!-- OUTPUT MODE (view mode when not editing) -->
-          <ng-template pTemplate="output">
-            <!-- Condition 1: columnEditable=true + columnDesgin=true -->
-            @if (col.columnDesgin) {
-            <ng-container
-              [ngTemplateOutlet]="col.columnDesgin"
-              [ngTemplateOutletContext]="{
+        <!-- OUTPUT MODE (view mode when not editing) -->
+        <ng-template pTemplate="output">
+          <!-- Condition 1: columnEditable=true + columnDesgin=true -->
+          @if (col.columnDesgin) {
+          <ng-container
+            [ngTemplateOutlet]="col.columnDesgin"
+            [ngTemplateOutletContext]="{
                 $implicit: product,
                 editing: false,
                 col: col,
               }"
-            >
-            </ng-container>
-            }
-            <!-- Condition 2: columnEditable=true + columnDesgin=false -->
-            @else {
-            <td>  {{ product[col.field] }}</td>
-            }
-          </ng-template>
-        </p-cellEditor>
-        }
-
-        <!-- Condition 3 & 4: col.columnEditable = false -->
-        @else {
-        <!-- Condition 3: columnEditable=false + columnDesgin=true -->
-        @if (col.columnDesgin) {
-        <ng-container
-          [ngTemplateOutlet]="col.columnDesgin"
-          [ngTemplateOutletContext]="{ $implicit: product, col: col }"
-        >
-        </ng-container>
-        }
-        <!-- Condition 4: columnEditable=false + columnDesgin=false -->
-        @else {
-        <td>  {{ product[col.field] }}</td>
-        } }
-      </td>
+          >
+          </ng-container>
+          }
+          <!-- Condition 2: columnEditable=true + columnDesgin=false -->
+          @else {
+          {{ product[col.field] }}
+          }
+        </ng-template>
+      </p-cellEditor>
       }
-    </tr>
+
+      <!-- Condition 3 & 4: col.columnEditable = false -->
+      @else {
+      <!-- Condition 3: columnEditable=false + columnDesgin=true -->
+      @if (col.columnDesgin) {
+      <ng-container
+        [ngTemplateOutlet]="col.columnDesgin"
+        [ngTemplateOutletContext]="{ $implicit: product, col: col }"
+      >
+      </ng-container>
+      }
+      <!-- Condition 4: columnEditable=false + columnDesgin=false -->
+      @else {
+      {{ product[col.field] }}
+
+      } }
+    </td>
+    }
+  </tr>
 </ng-template>

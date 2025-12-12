@@ -6,3 +6,12 @@
   background-color: rgb(0, 0, 0) !important;
   color: rgb(255, 255, 255) !important;
 }
+
+
+::ng-deep .column-class{
+  
+  max-width: 100px;
+  overflow: hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}

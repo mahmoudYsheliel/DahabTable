@@ -8,9 +8,11 @@ import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { ChangeDetectorRef } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
+import { Tooltip } from "primeng/tooltip";
+import { cellErrorMap } from '../../../table_config/column.config';
 @Component({
   selector: 'app-body',
-  imports: [NgStyle, NgClass, ButtonModule,TableModule,FormsModule,NgTemplateOutlet,InputTextModule],
+  imports: [NgStyle, NgClass, ButtonModule, TableModule, FormsModule, NgTemplateOutlet, InputTextModule, Tooltip],
   templateUrl: './body.html',
   styleUrl: './body.css',
   providers:[MessageService]
@@ -24,8 +26,6 @@ export class Body {
   freezeExpansion = input<boolean>()
   freezeSelection = input<boolean>()
   @ViewChild('template', { static: true }) template!: TemplateRef<any>;
-
-  constructor(private messageService: MessageService, private cdr: ChangeDetectorRef) {}
 
  
   getClass(v: any) {
@@ -41,6 +41,8 @@ export class Body {
     return undefined;
   }
 
+
+  cellErrors = cellErrorMap
   
 
 }

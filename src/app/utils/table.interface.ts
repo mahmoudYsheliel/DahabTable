@@ -8,25 +8,38 @@ import {
   TablePageEvent,
 } from 'primeng/table';
 import { ColumnConfig, generateColumnConfig } from './column.interface';
-import { Signal, signal, TemplateRef } from '@angular/core';
+import { TemplateRef } from '@angular/core';
 import { TreeTableSortEvent } from 'primeng/treetable';
 import { MenuItem } from 'primeng/api';
+import {
+  AlignFrozenDirection,
+  AggregationFunc,
+  TableSortMode,
+  TableSize,
+  TableSelectionMethod,
+  TableContextMenu,
+} from './tpyes';
+import { ContextMenu } from 'primeng/contextmenu';
 
-
-type Func = (data:any[])=>any
 export interface AggCell {
-  colSpan:number,
-  func:Func
-  isFrozen?:boolean,
-  alignFrozen?: 'left' | 'right',
+  colSpan: number;
+  func: AggregationFunc;
+  isFrozen?: boolean;
+  alignFrozen?: AlignFrozenDirection;
 }
+export interface ExportMethods {
+  csv?: boolean;
+  excel?: boolean;
+  pdf?: boolean;
+}
+
 export interface TableConfig<TInput = any> {
   // data and structure fields
   dataKey?: string;
   columns: ColumnConfig[];
 
   // styling fields
-  size?: 'small' | 'large';
+  size?: TableSize;
   showGridlines?: boolean;
   stripedRows?: boolean;
   tableStyle?: Object;
@@ -39,7 +52,7 @@ export interface TableConfig<TInput = any> {
   first?: number;
   showCurrentPageReport?: boolean;
   currentPageReportTemplate?: string;
-  onPage?: (event:TablePageEvent) => void; // not working properly
+  onPage?: (event: TablePageEvent) => void;
   rowsPerPageOptions?: number[];
   totalRecords?: number;
 
@@ -49,16 +62,16 @@ export interface TableConfig<TInput = any> {
   onLazyLoading?: (input: TableLazyLoadEvent) => void;
 
   //filters
-  onFilter?: (event:TableFilterEvent) => void;
+  onFilter?: (event: TableFilterEvent) => void;
   clearFilters?: boolean;
 
   // sorting
-  sortMode?: 'single' | 'multiple';
-  onSort?: (event:TreeTableSortEvent) => void;
+  sortMode?: TableSortMode;
+  onSort?: (event: TreeTableSortEvent) => void;
 
   // selection
-  selectionMethod?: 'checkbox'| 'radiobutton';
-  freezeSelection?:boolean;
+  selectionMethod?: TableSelectionMethod;
+  freezeSelection?: boolean;
   onRowSelect?: (event: TableRowSelectEvent) => void;
   onRowUnselect?: (event: TableRowUnSelectEvent<TInput>) => void;
 
@@ -67,12 +80,11 @@ export interface TableConfig<TInput = any> {
   expandedRowTempelate?: TemplateRef<any>;
   onExpansion?: (event: TableRowExpandEvent) => void;
   onCollapse?: (event: TableRowCollapseEvent) => void;
-  freezeExpansion?:boolean;
+  freezeExpansion?: boolean;
 
   //scrolling
   scrollable?: boolean;
   scrollHeight?: string;
-
 
   // aggregation
   aggregationFuncs?: AggCell[][]; // array of fields and there colspans and functions
@@ -87,13 +99,12 @@ export interface TableConfig<TInput = any> {
   paginationTemplate?: TemplateRef<any>;
 
   // caption configuration
-  captionTitle?:string;
-  showCaptionFilter?:boolean;
-  showfilterChips?:boolean;
-  showInputSearch?:boolean;
+  captionTitle?: string;
+  showCaptionFilter?: boolean;
+  showfilterChips?: boolean;
+  showInputSearch?: boolean;
   globalFilterFields?: string[];
-  captionActionTemplate?:TemplateRef<any>;
-  
+  captionActionTemplate?: TemplateRef<any>;
 
   // virtual scroll
   virtualScroll?: boolean;
@@ -104,18 +115,12 @@ export interface TableConfig<TInput = any> {
 
   // export options
   exportFilename?: string;
-  exportButtons?: {
-    csv?: boolean;
-    excel?: boolean;
-    pdf?: boolean;
-  };
+  exportButtons?: ExportMethods;
 
   // context menu options
   contextMenu?: boolean;
-  contextMenuItems?: MenuItem[] | ((rowData: any) => MenuItem[]);
+  contextMenuItems?:TableContextMenu;
 }
-
-
 
 export function getTableConfig(tableConfig: TableConfig | undefined): TableConfig | undefined {
   if (!tableConfig) return;
