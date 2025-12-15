@@ -20,6 +20,7 @@ export function generateProducts(count: number): Product[] {
         name: category,
         parent: Math.random() > 0.7 ? 'General Goods' : undefined,
       },
+      categoryType: category,
       quantity: Math.floor(Math.random() * 500),
       rating: +(Math.random() * 5).toFixed(1),
       isActive: Math.random() > 0.5,

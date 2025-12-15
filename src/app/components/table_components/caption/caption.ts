@@ -16,6 +16,9 @@ import { PopoverModule } from 'primeng/popover';
 import { FloatLabel } from 'primeng/floatlabel';
 import { FormsModule } from '@angular/forms';
 import { NgTemplateOutlet } from '@angular/common';
+import { SelectModule } from 'primeng/select';
+import { ColumnConfig } from '../../../utils/column.interface';
+
 
 @Component({
   selector: 'app-caption',
@@ -27,6 +30,7 @@ import { NgTemplateOutlet } from '@angular/common';
     PopoverModule,
     FloatLabel,
     FormsModule,
+    SelectModule,
   ],
   templateUrl: './caption.html',
   styleUrl: './caption.css',
@@ -44,6 +48,53 @@ export class Caption {
   exportButtons = input<{ csv?: boolean; excel?: boolean; pdf?: boolean }>();
   exportFilename = input<string>('export');
   exportData = input<any[]>([]);
+
+  // ✅ Grouping configuration
+  groupingEnabled = input<boolean>(false);
+  columns = input<ColumnConfig[]>([]);
+  groupableColumns = input<string[]>([]); // ✅ NEW: Specific columns allowed for grouping
+  
+  // ✅ Add these outputs
+  onExpandAll = output<void>();
+  onCollapseAll = output<void>();
+
+  // ✅ Internal grouping state
+  selectedGroupField = signal<string | null>(null);
+  
+  // ✅ Available fields for grouping (computed from columns and config)
+  availableGroupFields = computed(() => {
+    const groupable = this.groupableColumns();
+    
+    // If specific groupable columns are provided, filter by those
+    if (groupable && groupable.length > 0) {
+      return this.columns()
+        .filter(col => col.field && groupable.includes(col.field))
+        .map(col => ({
+          field: col.field!,
+          header: col.header || col.field!
+        }));
+    }
+    
+    // Otherwise, use all sortable columns (default behavior)
+    return this.columns()
+      .filter(col => col.field && col.sortable !== false)
+      .map(col => ({
+        field: col.field!,
+        header: col.header || col.field!
+      }));
+  });
+  
+  // ✅ Get selected group header name
+  selectedGroupHeader = computed(() => {
+    if (!this.selectedGroupField()) return '';
+    const field = this.availableGroupFields().find(
+      f => f.field === this.selectedGroupField()
+    );
+    return field?.header || '';
+  });
+  
+  // ✅ Output event for group field change
+  onGroupFieldChange = output<string | null>();
 
   searchValue: string | undefined;
 
@@ -106,12 +157,18 @@ export class Caption {
     }
   }
 
-  // ✅ Export to CSV
+  // ✅ Handle group field selection
+  onGroupChange(field: string | null) {
+    this.selectedGroupField.set(field);
+    this.onGroupFieldChange.emit(field);
+  }
+
+  // Export to CSV
   exportCSV() {
     this.table().exportCSV();
   }
 
-  // ✅ Export to Excel
+  // Export to Excel
   exportExcel() {
     import('xlsx').then((xlsx) => {
       const worksheet = xlsx.utils.json_to_sheet(this.exportData());
@@ -141,7 +198,7 @@ export class Caption {
     });
   }
 
-  // ✅ FIXED: Export to PDF
+  // Export to PDF
   exportPDF() {
     Promise.all([
       import('jspdf'),
@@ -153,13 +210,11 @@ export class Caption {
         
         const doc = new jsPDF();
         
-        // Get columns from table
         const columns = this.table().columns?.map((col: any) => col.header) || [];
         const rows = this.exportData().map((item: any) => 
           (this.table().columns || []).map((col: any) => item[col.field])
         );
 
-        // Use autoTable function correctly
         autoTable(doc, {
           head: [columns],
           body: rows,
@@ -170,7 +225,7 @@ export class Caption {
             cellPadding: 5,
           },
           headStyles: {
-            fillColor: [33, 128, 141], // Teal color
+            fillColor: [33, 128, 141],
             textColor: [255, 255, 255],
             fontStyle: 'bold',
           }
@@ -184,5 +239,4 @@ export class Caption {
       console.error('Failed to load PDF libraries:', error);
     });
   }
-
 }

@@ -25,6 +25,10 @@ export function getColumnConfig(
       },
     },
     {
+      field: 'categoryType',
+      header: 'Category Type',
+    },
+    {
       field: 'price',
       header: 'Price',
       filterType: 'numeric',

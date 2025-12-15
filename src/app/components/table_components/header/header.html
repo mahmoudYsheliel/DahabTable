@@ -1,36 +1,57 @@
-
 <ng-template #template let-columns>
-  <tr>
-    @if (columns) { @if (expandable()) {
-    <th style="width: 5rem" pFrozenColumn [frozen]="freezeExpansion() || false" ></th>
-    } @if (selectionMethod() == 'checkbox') {
-    <th style="width: 4rem" pFrozenColumn [frozen]="freezeSelection() || false"><p-tableHeaderCheckbox /></th>
-    }@else if (selectionMethod() == 'radiobutton') {
-    <th style="width: 4rem" pFrozenColumn [frozen]="freezeSelection() || false"></th>
-    } @for (column of columns; track ($index + 'header')) {
-    <th
-      [pSortableColumn]="column.sortable ? column.field : undefined"
-      pReorderableColumn="column.field"
-      pFrozenColumn
-      [frozen]="column.isFrozen || false"
-      [alignFrozen]="column.alignFrozen"
-    >
-      <div style="display: flex; justify-content: space-between; align-items: center">
-        <div>
-          {{ column.header }}
-          @if(column.sortable){
-          <p-sortIcon [field]="column.field" />
-          }
-        </div>
-        @if (column.filterable) {
-        <p-columnFilter
-          [type]="column.filterType || 'text'"
-          [field]="column.field"
-          display="menu"
-        ></p-columnFilter>
+  @if (!isGroupMode()) {
+    <!-- Normal Mode - All columns -->
+    <tr>
+      @if (expandable()) {
+        <th style="width: 5rem" pFrozenColumn [frozen]="freezeExpansion() || false"></th>
+      }
+      
+      @if (selectionMethod() === 'checkbox') {
+        <th style="width: 4rem" pFrozenColumn [frozen]="freezeSelection() || false">
+          <p-tableHeaderCheckbox />
+        </th>
+      } @else if (selectionMethod() === 'radiobutton') {
+        <th style="width: 4rem" pFrozenColumn [frozen]="freezeSelection() || false"></th>
+      } 
+      
+      @if (columns) {
+        @for (column of columns; track ($index + 'header')) {
+          <th
+            [pSortableColumn]="column.sortable ? column.field : undefined"
+            pReorderableColumn="column.field"
+            pFrozenColumn
+            [frozen]="column.isFrozen || false"
+            [alignFrozen]="column.alignFrozen"
+          >
+            <div style="display: flex; justify-content: space-between; align-items: center">
+              <div>
+                {{ column.header }}
+                @if(column.sortable){
+                  <p-sortIcon [field]="column.field" />
+                }
+              </div>
+              @if (column.filterable) {
+                <p-columnFilter
+                  [type]="column.filterType || 'text'"
+                  [field]="column.field"
+                  display="menu"
+                ></p-columnFilter>
+              }
+            </div>
+          </th>
         }
-      </div>
-    </th>
-    } }
-  </tr>
+      }
+    </tr>
+  } @else {
+    <!-- Group Mode - Simple header WITHOUT select-all checkbox -->
+    <tr>
+      <!-- ✅ NEW: Checkbox in first column (yellow circle) -->
+      <th style="width: 4rem; text-align: center;">
+        <p-tableHeaderCheckbox />
+      </th>
+      <th style="width: 3rem;"></th>
+      <th>{{ groupFieldHeader() }}</th>
+      <th style="text-align: center;" [attr.colspan]="totalColumnCount() - 3">Count</th>
+    </tr>
+  }
 </ng-template>

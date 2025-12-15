@@ -1,4 +1,4 @@
-import { Component, computed, signal, input, model, ViewChild } from '@angular/core';
+import { Component, computed, signal, input, model, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { TableModule, Table } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
@@ -19,6 +19,8 @@ import { BadgeModule } from 'primeng/badge';
 import { FormsModule } from '@angular/forms';
 import { ContextMenuModule, ContextMenu } from 'primeng/contextmenu';
 import { MenuItem } from 'primeng/api';
+import { GroupRow } from '../table_components/group-row/group-row.component';
+import { TableUtils } from '../../utils/table-utils';
 
 @Component({
   selector: 'app-table',
@@ -48,49 +50,72 @@ import { MenuItem } from 'primeng/api';
 export class DahabTable {
   @ViewChild('dt') table!: Table;
   @ViewChild('cm') cm!: ContextMenu;
+  @ViewChildren(GroupRow) groupRows!: QueryList<GroupRow>;
 
-  // table config and data
+  // Table config and data
   tableConfig = input<TableConfig>();
   data = model<any[]>([]);
 
-  //selected and expanded rows
+  // Selected and expanded rows
   selectedProducts = model<any[]>([]);
   expandedRows = model<Record<string, boolean>>({});
 
-  // table config with default values to be used later
+  // Table config with default values
   generatedTC = computed(() => ({ ...getTableConfig(this.tableConfig()) }));
 
-  // context menu properities
+  // Context menu properties
   selectedRowForContextMenu: any = null;
   contextMenuItems = signal<MenuItem[]>([]);
 
-  // map holding old values for edited cells to undo edits
+  // Grouping state
+  currentGroupField = signal<string | null>(null);
+  filteredData = signal<any[]>([]);
+  
+  // Computed grouped data from filtered data
+  groupedData = computed(() => {
+    const field = this.currentGroupField();
+    if (!field) return [];
+    
+    const dataToGroup = this.filteredData().length > 0 
+      ? this.filteredData() 
+      : this.data();
+    
+    return TableUtils.groupDataByField(dataToGroup, field);
+  });
+
+  // Map holding old values for edited cells
   private editingValues = new Map<string, any>();
 
-
+  /**
+   * Handle edit initialization - KEEP (uses component state)
+   */
   onEditInit(event: any) {
     const { data, field } = event;
-    const key = `${data[this.generatedTC().dataKey || 'id']}-${field}`;
+    const key = TableUtils.generateEditKey(data, field, this.generatedTC().dataKey || 'id');
     this.editingValues.set(key, data[field]);
   }
 
+  /**
+   * Handle edit completion - KEEP (uses component state + calls callbacks)
+   */
   onEditComplete(event: any) {
     const { data, field } = event;
-    const col = this.generatedTC().columns?.find((c) => c.field === field);
-
+    const col = TableUtils.findColumn(this.generatedTC().columns || [], field);
     if (!col) return;
 
-    const key = `${data[this.generatedTC().dataKey || 'id']}-${field}`;
+    const key = TableUtils.generateEditKey(data, field, this.generatedTC().dataKey || 'id');
     const oldValue = this.editingValues.get(key);
     const newValue = data[field];
 
     if (oldValue !== newValue && col.columnEditMethod) {
-       col.columnEditMethod({ data, newValue, oldValue });
+      col.columnEditMethod({ data, newValue, oldValue });
     }
-
     this.editingValues.delete(key);
   }
 
+  /**
+   * Update context menu - KEEP (uses component state + calls callbacks)
+   */
   updateContextMenu() {
     if (!this.generatedTC().contextMenuItems || !this.selectedRowForContextMenu) {
       this.contextMenuItems.set([]);
@@ -101,10 +126,89 @@ export class DahabTable {
     this.contextMenuItems.set(items);
   }
 
-  undefiendHandler(func: Function | undefined, input: any) {
-    if (func != undefined) {
-      return func(input);
+  /**
+   * Handle group field change - KEEP (manages component state)
+   */
+  onGroupFieldChange(field: string | null) {
+    this.currentGroupField.set(field);
+    
+    if (!field) {
+      this.filteredData.set([]);
+    } else {
+      const current = this.table?.filteredValue || this.data();
+      this.filteredData.set(current);
     }
-    return undefined;
+  }
+
+  /**
+   * Handle filter change - KEEP (manages component state + calls callbacks)
+   */
+  onFilterChange(event: any) {
+    if (this.currentGroupField()) {
+      this.filteredData.set(event.filteredValue || []);
+    }
+    
+    if (this.generatedTC().onFilter) {
+      this.generatedTC().onFilter!(event);
+    }
+  }
+
+  /**
+   * Handle sort change - KEEP (manages component state + calls callbacks)
+   */
+  onSortChange(event: any) {
+    if (this.currentGroupField()) {
+      const sortedData = this.table?.filteredValue || this.table?.value || [];
+      this.filteredData.set([...sortedData]);
+    }
+    
+    if (this.generatedTC().onSort) {
+      this.generatedTC().onSort!(event);
+    }
+  }
+
+  /**
+   * Expand all groups - KEEP (manages ViewChildren state)
+   */
+  expandAllGroups() {
+    this.groupRows?.forEach(row => row.isExpanded.set(true));
+  }
+
+  /**
+   * Collapse all groups - KEEP (manages ViewChildren state)
+   */
+  collapseAllGroups() {
+    this.groupRows?.forEach(row => row.isExpanded.set(false));
+  }
+
+  /**
+   * Select items in a group - SIMPLIFIED (uses utility)
+   */
+  handleGroupSelect(items: any[]) {
+    const newSelection = TableUtils.addToSelection(
+      this.selectedProducts(),
+      items,
+      this.generatedTC().dataKey || 'id'
+    );
+    this.selectedProducts.set(newSelection);
+  }
+
+  /**
+   * Unselect items in a group - SIMPLIFIED (uses utility)
+   */
+  handleGroupUnselect(items: any[]) {
+    const newSelection = TableUtils.removeFromSelection(
+      this.selectedProducts(),
+      items,
+      this.generatedTC().dataKey || 'id'
+    );
+    this.selectedProducts.set(newSelection);
+  }
+
+  /**
+   * Safe function caller - SIMPLIFIED (uses utility)
+   */
+  undefiendHandler(func: Function | undefined, input: any) {
+    return TableUtils.callIfDefined(func, input);
   }
 }

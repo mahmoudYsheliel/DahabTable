@@ -119,8 +119,15 @@ export interface TableConfig<TInput = any> {
 
   // context menu options
   contextMenu?: boolean;
-  contextMenuItems?:TableContextMenu;
+  contextMenuItems?: TableContextMenu;
+
+  // ✅ NEW: Row grouping configuration
+  grouping?: {
+    enabled: boolean;
+    groupableColumns?: string[]; // ✅ NEW: Specify which column fields can be grouped
+  };
 }
+
 
 export function getTableConfig(tableConfig: TableConfig | undefined): TableConfig | undefined {
   if (!tableConfig) return;

@@ -53,7 +53,7 @@ export function getInitialTableConfig(
     showFooter: true,
 
     scrollable: true,
-    scrollHeight: '500px',
+    scrollHeight: '1000px',
 
     onFilter,
     onSort,
@@ -82,5 +82,10 @@ export function getInitialTableConfig(
 
     contextMenu: true,
     contextMenuItems: contextMenu,
+
+     grouping: {
+    enabled: true,
+    groupableColumns: ['categoryType', 'name', 'code'] // Only these columns available in dropdown
+  }
   };
 }

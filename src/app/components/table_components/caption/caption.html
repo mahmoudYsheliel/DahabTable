@@ -1,5 +1,5 @@
 <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 1rem">
-  <!-- Left side: Filter and Title -->
+  <!-- Left side: Filter, Title, and Grouping -->
   <div style="display: flex; align-items: center; gap: 1rem">
     @if (showFilter()) {
     <p-button [outlined]="true" icon="pi pi-filter" (click)="menu.toggle($event)" />
@@ -19,7 +19,51 @@
         <p-button label="Search" (click)="search()" />
       </div>
     </p-popover>
-    } 
+    }
+
+    <!-- Group By Selector -->
+    @if (groupingEnabled() && availableGroupFields().length > 0) {
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <p-select
+          [(ngModel)]="selectedGroupField"
+          [options]="availableGroupFields()"
+          optionLabel="header"
+          optionValue="field"
+          placeholder="Group By"
+          [showClear]="true"
+          (onChange)="onGroupChange($event.value)"
+          [style]="{'min-width': '150px'}"
+        >
+          <ng-template let-option #item>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <i class="pi pi-table"></i>
+              <span>{{ option.header }}</span>
+            </div>
+          </ng-template>
+        </p-select>
+        
+        <!-- Expand/Collapse All buttons -->
+        @if (selectedGroupField()) {
+          <p-button
+            icon="pi pi-plus"
+            [text]="true"
+            [rounded]="true"
+            size="small"
+            pTooltip="Expand All"
+            (onClick)="onExpandAll.emit()"
+          />
+          <p-button
+            icon="pi pi-minus"
+            [text]="true"
+            [rounded]="true"
+            size="small"
+            pTooltip="Collapse All"
+            (onClick)="onCollapseAll.emit()"
+          />
+        }
+      </div>
+}
+
     
     @if (title()) {
     <p style="margin: 0">{{ table().totalRecords }} {{ title() }}</p>
@@ -38,6 +82,14 @@
         } 
       } 
     }
+    
+    <!--  Show active grouping as chip -->
+    @if (selectedGroupField()) {
+      <p-chip styleClass="bg-primary">
+        <span>Grouped by: {{ selectedGroupHeader() }}</span>
+        <i class="pi pi-times-circle" (click)="onGroupChange(null)"></i>
+      </p-chip>
+    }
   </div>
 
   <!-- Right side: Search and Export Buttons -->
@@ -52,7 +104,7 @@
     />
     }
     
-    <!-- ✅ Export Buttons - now calling local methods -->
+    <!--Export Buttons - now calling local methods -->
     @if (exportButtons()) {
       <div style="display: flex; gap: 0.5rem">
         @if (exportButtons()?.csv) {
