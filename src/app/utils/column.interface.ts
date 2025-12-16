@@ -16,6 +16,8 @@ export interface ColumnConfig {
   columnStyle?: object;
   columnClass?: string;
   tooltip?:(rowData:any)=>void
+  width?: string;  // NEW: Column width (e.g., '150px', '20%')
+  resizable?: boolean;  // NEW: Enable/disable resizing per column
   // filterTemplate?: TemplateRef<any>;
 }
 
@@ -26,6 +28,7 @@ export function generateColumnConfig(columnConfigs: ColumnConfig[]) {
       filterable:true,
       sortable:true,
       filterType:'text',
+      resizable: true,
       ...columnConfig
     })
   }

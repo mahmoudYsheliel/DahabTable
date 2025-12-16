@@ -48,6 +48,7 @@
   (onPage)="undefiendHandler(generatedTC().onPage, $event)"
   [(contextMenuSelection)]="selectedRowForContextMenu"
   [contextMenu]="cm"
+  [resizableColumns]="generatedTC().columnResizeable || true"
 >
 
 
@@ -175,6 +176,7 @@
     [selectedProducts]="selectedProducts()"
     (onGroupSelect)="handleGroupSelect($event)"
     (onGroupUnselect)="handleGroupUnselect($event)"
+    (onGroupRowCreated)="registerGroupRow($event)"
   ></app-body>
 
   <ng-container

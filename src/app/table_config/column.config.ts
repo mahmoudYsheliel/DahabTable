@@ -27,6 +27,7 @@ export function getColumnConfig(
     {
       field: 'categoryType',
       header: 'Category Type',
+      width: '200px',
     },
     {
       field: 'price',

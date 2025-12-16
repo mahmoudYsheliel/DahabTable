@@ -49,7 +49,8 @@ export class Body {
   // ✅ NEW: Output events for group selection
   onGroupSelect = output<any[]>();
   onGroupUnselect = output<any[]>();
-  
+  onGroupRowCreated = output<GroupRow>();
+
   @ViewChild('template', { static: true }) template!: TemplateRef<any>;
 
   cellErrors = cellErrorMap;
@@ -74,6 +75,11 @@ export class Body {
     const cellError = this.cellErrors[item.id]?.[col.field || ''];
     const customTooltip = TableUtils.callIfDefined(col.tooltip, item);
     return cellError || customTooltip || '';
+  }
+
+  registerGroupRow(groupRow: GroupRow) {
+    this.onGroupRowCreated.emit(groupRow);
+    return ''; // Return empty string so it doesn't show in UI
   }
   
   // ✅ NEW: Handle group selection

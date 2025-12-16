@@ -126,6 +126,8 @@ export interface TableConfig<TInput = any> {
     enabled: boolean;
     groupableColumns?: string[]; // ✅ NEW: Specify which column fields can be grouped
   };
+
+  columnResizeable?: boolean; // NEW: Enable/disable column resizing
 }
 
 

@@ -2,11 +2,12 @@ import { Component, input, TemplateRef, ViewChild, computed } from '@angular/cor
 import { TableModule } from 'primeng/table';
 import { ColumnConfig } from '../../../utils/column.interface';
 import { TableUtils } from '../../../utils/table-utils';
+import { NgStyle } from '@angular/common';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.html',
-  imports: [TableModule], // ✅ TableModule includes p-tableHeaderCheckbox
+  imports: [TableModule, NgStyle], // ✅ TableModule includes p-tableHeaderCheckbox
 })
 export class Header {
   selectionMethod = input<'checkbox' | 'radiobutton'>();

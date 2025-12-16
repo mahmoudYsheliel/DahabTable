@@ -18,7 +18,7 @@ import { FormsModule } from '@angular/forms';
 import { NgTemplateOutlet } from '@angular/common';
 import { SelectModule } from 'primeng/select';
 import { ColumnConfig } from '../../../utils/column.interface';
-
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-caption',
@@ -31,6 +31,7 @@ import { ColumnConfig } from '../../../utils/column.interface';
     FloatLabel,
     FormsModule,
     SelectModule,
+    TooltipModule,
   ],
   templateUrl: './caption.html',
   styleUrl: './caption.css',

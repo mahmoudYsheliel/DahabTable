@@ -50,7 +50,7 @@ import { TableUtils } from '../../utils/table-utils';
 export class DahabTable {
   @ViewChild('dt') table!: Table;
   @ViewChild('cm') cm!: ContextMenu;
-  @ViewChildren(GroupRow) groupRows!: QueryList<GroupRow>;
+  groupRowComponents = signal<GroupRow[]>([]);
 
   // Table config and data
   tableConfig = input<TableConfig>();
@@ -166,20 +166,36 @@ export class DahabTable {
       this.generatedTC().onSort!(event);
     }
   }
-
-  /**
-   * Expand all groups - KEEP (manages ViewChildren state)
-   */
-  expandAllGroups() {
-    this.groupRows?.forEach(row => row.isExpanded.set(true));
+  registerGroupRow(groupRow: GroupRow) {
+  const current = this.groupRowComponents();
+  if (!current.includes(groupRow)) {
+    this.groupRowComponents.set([...current, groupRow]);
   }
+}
 
-  /**
-   * Collapse all groups - KEEP (manages ViewChildren state)
-   */
-  collapseAllGroups() {
-    this.groupRows?.forEach(row => row.isExpanded.set(false));
+/**
+ * Expand all groups
+ */
+expandAllGroups() {
+  const groups = this.groupRowComponents();
+  if (groups.length === 0) {
+    console.warn('No group rows registered yet');
+    return;
   }
+  groups.forEach(row => row.isExpanded.set(true));
+}
+
+/**
+ * Collapse all groups
+ */
+collapseAllGroups() {
+  const groups = this.groupRowComponents();
+  if (groups.length === 0) {
+    console.warn('No group rows registered yet');
+    return;
+  }
+  groups.forEach(row => row.isExpanded.set(false));
+}
 
   /**
    * Select items in a group - SIMPLIFIED (uses utility)

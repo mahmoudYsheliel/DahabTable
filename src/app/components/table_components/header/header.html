@@ -3,43 +3,118 @@
     <!-- Normal Mode - All columns -->
     <tr>
       @if (expandable()) {
-        <th style="width: 5rem" pFrozenColumn [frozen]="freezeExpansion() || false"></th>
+        <th style="width: 5rem" pFrozenColumn [frozen]="freezeExpansion() || false" pResizableColumn></th>
       }
       
       @if (selectionMethod() === 'checkbox') {
-        <th style="width: 4rem" pFrozenColumn [frozen]="freezeSelection() || false">
+        <th style="width: 4rem" pFrozenColumn [frozen]="freezeSelection() || false" pResizableColumn>
           <p-tableHeaderCheckbox />
         </th>
       } @else if (selectionMethod() === 'radiobutton') {
-        <th style="width: 4rem" pFrozenColumn [frozen]="freezeSelection() || false"></th>
+        <th style="width: 4rem" pFrozenColumn [frozen]="freezeSelection() || false" pResizableColumn></th>
       } 
       
       @if (columns) {
-        @for (column of columns; track ($index + 'header')) {
-          <th
-            [pSortableColumn]="column.sortable ? column.field : undefined"
-            pReorderableColumn="column.field"
-            pFrozenColumn
-            [frozen]="column.isFrozen || false"
-            [alignFrozen]="column.alignFrozen"
-          >
-            <div style="display: flex; justify-content: space-between; align-items: center">
-              <div>
-                {{ column.header }}
-                @if(column.sortable){
-                  <p-sortIcon [field]="column.field" />
+          @for (column of columns; track ($index + 'header')) {
+          @if (column.resizable && column.isFrozen) {
+            <th
+              [pSortableColumn]="column.sortable ? column.field : undefined"
+              pReorderableColumn="column.field"
+              pFrozenColumn
+              [frozen]="true"
+              [alignFrozen]="column.alignFrozen"
+              pResizableColumn
+              [ngStyle]="{ width: column.width }"
+            >
+              <div style="display: flex; justify-content: space-between; align-items: center">
+                <div>
+                  {{ column.header }}
+                  @if(column.sortable){
+                    <p-sortIcon [field]="column.field" />
+                  }
+                </div>
+                @if (column.filterable) {
+                  <p-columnFilter
+                    [type]="column.filterType || 'text'"
+                    [field]="column.field"
+                    display="menu"
+                  ></p-columnFilter>
                 }
               </div>
-              @if (column.filterable) {
-                <p-columnFilter
-                  [type]="column.filterType || 'text'"
-                  [field]="column.field"
-                  display="menu"
-                ></p-columnFilter>
-              }
-            </div>
-          </th>
+            </th>
+          } @else if (column.resizable  && !column.isFrozen) {
+            <th
+              [pSortableColumn]="column.sortable ? column.field : undefined"
+              pReorderableColumn="column.field"
+              pResizableColumn
+              [ngStyle]="{ width: column.width }"
+            >
+              <div style="display: flex; justify-content: space-between; align-items: center">
+                <div>
+                  {{ column.header }}
+                  @if(column.sortable){
+                    <p-sortIcon [field]="column.field" />
+                  }
+                </div>
+                @if (column.filterable) {
+                  <p-columnFilter
+                    [type]="column.filterType || 'text'"
+                    [field]="column.field"
+                    display="menu"
+                  ></p-columnFilter>
+                }
+              </div>
+            </th>
+          } @else if (column.resizable === false && column.isFrozen) {
+            <th
+              [pSortableColumn]="column.sortable ? column.field : undefined"
+              pReorderableColumn="column.field"
+              pFrozenColumn
+              [frozen]="true"
+              [alignFrozen]="column.alignFrozen"
+              [ngStyle]="{ width: column.width }"
+            >
+              <div style="display: flex; justify-content: space-between; align-items: center">
+                <div>
+                  {{ column.header }}
+                  @if(column.sortable){
+                    <p-sortIcon [field]="column.field" />
+                  }
+                </div>
+                @if (column.filterable) {
+                  <p-columnFilter
+                    [type]="column.filterType || 'text'"
+                    [field]="column.field"
+                    display="menu"
+                  ></p-columnFilter>
+                }
+              </div>
+            </th>
+          } @else {
+            <th
+              [pSortableColumn]="column.sortable ? column.field : undefined"
+              pReorderableColumn="column.field"
+              [ngStyle]="{ width: column.width }"
+            >
+              <div style="display: flex; justify-content: space-between; align-items: center">
+                <div>
+                  {{ column.header }}
+                  @if(column.sortable){
+                    <p-sortIcon [field]="column.field" />
+                  }
+                </div>
+                @if (column.filterable) {
+                  <p-columnFilter
+                    [type]="column.filterType || 'text'"
+                    [field]="column.field"
+                    display="menu"
+                  ></p-columnFilter>
+                }
+              </div>
+            </th>
+          }
         }
+
       }
     </tr>
   } @else {

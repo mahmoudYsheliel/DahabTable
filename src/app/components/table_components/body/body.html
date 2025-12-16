@@ -94,7 +94,7 @@
           (onGroupSelect)="handleGroupSelect($event)"
           (onGroupUnselect)="handleGroupUnselect($event)"
         ></app-group-row>
-        
+        {{ registerGroupRow(groupRow) }}
         <!-- Render group header -->
         <ng-container
           [ngTemplateOutlet]="groupRow.template"
