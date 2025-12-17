@@ -1,4 +1,4 @@
-
+<p>{{data()![0].price}}</p>
 @if (generatedTC().contextMenu) {
   <p-contextmenu 
     #cm 
@@ -103,6 +103,8 @@
   <ng-template #caption>
     <app-caption
       [table]="table"
+      [(tableConfig)]="tableConfig"
+      [(data)]="data"
       [actionTemplate]="generatedTC().captionActionTemplate"
       [title]="generatedTC().captionTitle"
       [showFilter]="generatedTC().showCaptionFilter"
@@ -160,6 +162,7 @@
   <!-- Single body component handles both modes -->
   <app-body
     #appBody
+    [table]="table"
     [expandable]="generatedTC().expandable"
     [columns]="generatedTC().columns"
     [rowClass]="generatedTC().rowClass"
@@ -199,6 +202,7 @@
     [aggregation]="generatedTC().aggregationFuncs"
     [isGroupMode]="!!currentGroupField()"
     [groupedData]="groupedData()"
+    [(rerender)]="rerender"
   >
   </app-footer>
   <ng-container [ngTemplateOutlet]="aggFooterTemplate.template"></ng-container>

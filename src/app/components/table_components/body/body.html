@@ -31,6 +31,7 @@
           [alignFrozen]="col.alignFrozen"
           [ngClass]="col.columnClass"
           [pTooltip]="getTooltip(product, col)"
+          [attr.data-editable]="col.columnEditable ? 'true' : null"
         >
       <!-- Condition 1 & 2: col.columnEditable = true -->
           @if (col.columnEditable) {
@@ -44,6 +45,7 @@
                   [type]="col.dataType || 'text'"
                   [(ngModel)]="product[col.field]"
                   fluid
+                  (keydown)="onEnter($event)"
                 />
               </ng-template>
 

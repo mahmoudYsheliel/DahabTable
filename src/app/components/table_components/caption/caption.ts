@@ -7,6 +7,7 @@ import {
   signal,
   TemplateRef,
   output,
+  model,
 } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
@@ -19,6 +20,8 @@ import { NgTemplateOutlet } from '@angular/common';
 import { SelectModule } from 'primeng/select';
 import { ColumnConfig } from '../../../utils/column.interface';
 import { TooltipModule } from 'primeng/tooltip';
+import * as XLSX from 'xlsx';
+import { TableConfig } from '../../../utils/table.interface';
 
 @Component({
   selector: 'app-caption',
@@ -39,13 +42,16 @@ import { TooltipModule } from 'primeng/tooltip';
 export class Caption {
   table = input.required<Table>();
 
+  tableConfig = model<TableConfig>()
+  data = model<any[]>()
+
   actionTemplate = input<TemplateRef<any>>();
   title = input<string>();
   showFilter = input<boolean>();
   showFilterChips = input<boolean>();
   showInputSearch = input<boolean>();
   globalFilterFields = input<string[]>();
-  
+
   exportButtons = input<{ csv?: boolean; excel?: boolean; pdf?: boolean }>();
   exportFilename = input<string>('export');
   exportData = input<any[]>([]);
@@ -54,18 +60,18 @@ export class Caption {
   groupingEnabled = input<boolean>(false);
   columns = input<ColumnConfig[]>([]);
   groupableColumns = input<string[]>([]); // ✅ NEW: Specific columns allowed for grouping
-  
+
   // ✅ Add these outputs
   onExpandAll = output<void>();
   onCollapseAll = output<void>();
 
   // ✅ Internal grouping state
   selectedGroupField = signal<string | null>(null);
-  
+
   // ✅ Available fields for grouping (computed from columns and config)
   availableGroupFields = computed(() => {
     const groupable = this.groupableColumns();
-    
+
     // If specific groupable columns are provided, filter by those
     if (groupable && groupable.length > 0) {
       return this.columns()
@@ -75,7 +81,7 @@ export class Caption {
           header: col.header || col.field!
         }));
     }
-    
+
     // Otherwise, use all sortable columns (default behavior)
     return this.columns()
       .filter(col => col.field && col.sortable !== false)
@@ -84,7 +90,7 @@ export class Caption {
         header: col.header || col.field!
       }));
   });
-  
+
   // ✅ Get selected group header name
   selectedGroupHeader = computed(() => {
     if (!this.selectedGroupField()) return '';
@@ -93,7 +99,7 @@ export class Caption {
     );
     return field?.header || '';
   });
-  
+
   // ✅ Output event for group field change
   onGroupFieldChange = output<string | null>();
 
@@ -208,11 +214,11 @@ export class Caption {
       try {
         const jsPDF = jsPDFModule.default;
         const autoTable = autoTableModule.default;
-        
+
         const doc = new jsPDF();
-        
+
         const columns = this.table().columns?.map((col: any) => col.header) || [];
-        const rows = this.exportData().map((item: any) => 
+        const rows = this.exportData().map((item: any) =>
           (this.table().columns || []).map((col: any) => item[col.field])
         );
 
@@ -240,4 +246,39 @@ export class Caption {
       console.error('Failed to load PDF libraries:', error);
     });
   }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const arrayBuffer = reader.result as ArrayBuffer;
+
+      // Read workbook
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+      // First sheet
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+
+      // Convert to JSON
+      const data:Object[] = XLSX.utils.sheet_to_json(worksheet, {
+        defval: '',      // keep empty cells
+        raw: true        // keep numbers as numbers
+      });
+      const keys =Object.keys(data[0])
+
+      const colConfig: ColumnConfig[] =keys.map(e=>{return {field:e,header:e.toUpperCase()}  })
+      this.tableConfig.set({columns:colConfig})
+      this.data.set(data)
+    };
+
+    reader.readAsArrayBuffer(file);
+
+  }
+
 }

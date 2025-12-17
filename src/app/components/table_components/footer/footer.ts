@@ -1,4 +1,4 @@
-import { Component, input, TemplateRef, ViewChild } from '@angular/core';
+import { Component, computed, effect, input, model, signal, TemplateRef, ViewChild } from '@angular/core';
 import { Table, TableModule } from 'primeng/table';
 import { AggCell } from '../../../utils/table.interface';
 
@@ -11,7 +11,8 @@ import { AggCell } from '../../../utils/table.interface';
 export class Footer {
   aggregation = input<AggCell[][]>();
   table = input.required<Table>();
-  
+  rerender = model()
+
   isGroupMode = input<boolean>(false);
   groupedData = input<any[]>([]);
 
@@ -20,6 +21,28 @@ export class Footer {
   /**
    * Get actual data (flatten groups if needed)
    */
+
+  aggResults = signal<Record<number, Record<number, any>>>({})
+  constructor() {
+    effect(() => {
+      if (this.rerender()) {
+        console.log(1)
+        const results: Record<number, Record<number, any>> = {}
+        if (!this.aggregation()!) return
+        for (let rowIndex = 0; rowIndex < this.aggregation()!.length; rowIndex++) {
+          const row = this.aggregation()![rowIndex]
+          for (let cellIndex = 0; cellIndex < row.length; cellIndex++) {
+            if (!results[rowIndex]) results[rowIndex] = {}
+
+            results[rowIndex][cellIndex] = this.executeAggregation(row[cellIndex].func)
+          }
+        }
+        this.aggResults.set(results)
+        this.rerender.set(false)
+      }
+
+    })
+  }
   private getActualData(): any[] {
     // ✅ If in group mode, flatten the grouped data
     if (this.isGroupMode() && this.groupedData().length > 0) {
@@ -29,7 +52,7 @@ export class Footer {
       });
       return flattened;
     }
-    
+
     // ✅ Normal mode - use filtered or all data
     return this.table().filteredValue || this.table().value || [];
   }
@@ -46,14 +69,14 @@ export class Footer {
     try {
       // ✅ Get the actual flattened data
       const data = this.getActualData();
-      
-      console.log('Footer data for aggregation:', data); // Debug
-      
+
+      // console.log('Footer data for aggregation:', data); // Debug
+
       // Call the function with the data
       const result = func(data);
-      
-      console.log('Aggregation result:', result); // Debug
-      
+
+      // console.log('Aggregation result:', result); // Debug
+
       // Return the result (could be string, number, etc.)
       return result !== undefined && result !== null ? result : '';
     } catch (error) {

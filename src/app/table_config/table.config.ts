@@ -83,9 +83,9 @@ export function getInitialTableConfig(
     contextMenu: true,
     contextMenuItems: contextMenu,
 
-     grouping: {
-    enabled: true,
-    groupableColumns: ['categoryType', 'name', 'code'] // Only these columns available in dropdown
-  }
+    grouping: {
+      enabled: true,
+      groupableColumns: ['categoryType', 'name', 'code'] // Only these columns available in dropdown
+    }
   };
 }

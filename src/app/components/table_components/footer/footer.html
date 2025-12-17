@@ -1,8 +1,8 @@
 <ng-template #footerTemplate let-columns>
   @if (aggregation()) {
-    @for (row of aggregation(); track $index) {
+    @for (row of aggregation(); track $index; let i = $index ) {
       <tr>
-        @for (cell of row; track $index) {
+        @for (cell of row; track $index; let j = $index) {
           <td 
             [attr.colspan]="cell.colSpan"
             pFrozenColumn
@@ -10,7 +10,8 @@
             [alignFrozen]="cell.alignFrozen || 'left'"
             style="font-weight: 600;"
           >
-            {{ executeAggregation(cell.func) }}
+            <!-- {{ executeAggregation(cell.func) }} -->
+            {{aggResults()[i][j]}}
           </td>
         }
       </tr>

@@ -21,6 +21,8 @@ import { ContextMenuModule, ContextMenu } from 'primeng/contextmenu';
 import { MenuItem } from 'primeng/api';
 import { GroupRow } from '../table_components/group-row/group-row.component';
 import { TableUtils } from '../../utils/table-utils';
+import { ChangeDetectorRef } from '@angular/core';
+
 
 @Component({
   selector: 'app-table',
@@ -53,7 +55,7 @@ export class DahabTable {
   groupRowComponents = signal<GroupRow[]>([]);
 
   // Table config and data
-  tableConfig = input<TableConfig>();
+  tableConfig = model<TableConfig>();
   data = model<any[]>([]);
 
   // Selected and expanded rows
@@ -83,6 +85,10 @@ export class DahabTable {
     return TableUtils.groupDataByField(dataToGroup, field);
   });
 
+
+  rerender = signal(true)
+
+
   // Map holding old values for edited cells
   private editingValues = new Map<string, any>();
 
@@ -90,6 +96,7 @@ export class DahabTable {
    * Handle edit initialization - KEEP (uses component state)
    */
   onEditInit(event: any) {
+    console.log(4)
     const { data, field } = event;
     const key = TableUtils.generateEditKey(data, field, this.generatedTC().dataKey || 'id');
     this.editingValues.set(key, data[field]);
@@ -99,18 +106,25 @@ export class DahabTable {
    * Handle edit completion - KEEP (uses component state + calls callbacks)
    */
   onEditComplete(event: any) {
+    console.log(5)
     const { data, field } = event;
+    console.log({event})
+    console.log(this.generatedTC().columns)
+    console.log(field)
     const col = TableUtils.findColumn(this.generatedTC().columns || [], field);
+    console.log(col)
     if (!col) return;
 
     const key = TableUtils.generateEditKey(data, field, this.generatedTC().dataKey || 'id');
     const oldValue = this.editingValues.get(key);
     const newValue = data[field];
 
+    console.log(oldValue , newValue , col.columnEditMethod)
     if (oldValue !== newValue && col.columnEditMethod) {
       col.columnEditMethod({ data, newValue, oldValue });
     }
     this.editingValues.delete(key);
+    this.rerender.set(true)
   }
 
   /**
