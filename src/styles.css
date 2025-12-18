@@ -2,3 +2,7 @@
 @import "primeicons/primeicons.css";
 
 
+
+:root{
+    --main-color:blue;
+}

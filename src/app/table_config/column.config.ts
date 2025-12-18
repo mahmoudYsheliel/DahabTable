@@ -11,7 +11,7 @@ export function getColumnConfig(
 ): ColumnConfig[] {
   return [
     { field: 'id', header: 'ID', sortable: false, filterable: false, isFrozen: true },
-    { field: 'code', header: 'Code' },
+    { field: 'code', header: 'Code',resizable:false},
     {
       field: 'name',
       header: 'Name',
@@ -19,7 +19,6 @@ export function getColumnConfig(
       columnEditMethod: (event: any) =>
         onNameEdit(event.data, event.newValue, event.oldValue, messageService),
       columnClass: 'column-class',
-      columnStyle: { 'background-color': 'blue' },
       tooltip: (rowData: Product) => {
         return rowData.name;
       },
@@ -35,6 +34,7 @@ export function getColumnConfig(
       filterType: 'numeric',
       columnDesgin: customColumnDesign,
       columnEditable: true,
+       columnStyle:{'text-align':'right'},
       columnEditMethod: (event: any) =>
         onPriceEdit(event.data, event.newValue, event.oldValue, messageService),
       isFrozen: true,

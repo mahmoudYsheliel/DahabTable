@@ -22,10 +22,13 @@ import { ColumnConfig } from '../../../utils/column.interface';
 import { TooltipModule } from 'primeng/tooltip';
 import * as XLSX from 'xlsx';
 import { TableConfig } from '../../../utils/table.interface';
-
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 @Component({
   selector: 'app-caption',
   imports: [
+    InputIconModule,
+    IconFieldModule,
     NgTemplateOutlet,
     InputTextModule,
     ButtonModule,

@@ -1,195 +1,150 @@
 <ng-template #template let-product let-columns="columns" let-expanded="expanded">
   @if (!isGroupMode()) {
-    <!-- ✅ Normal Mode - Single row -->
-    <tr [ngStyle]="getStyle(product)" [ngClass]="getClass(product)" [pContextMenuRow]="product">
-      @if (expandable()) {
-        <td pFrozenColumn [frozen]="freezeExpansion() || false">
-          <p-button
-            [pRowToggler]="product"
-            [text]="true"
-            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-          />
-        </td>
-      }
-      
-      @if (selectionMethod() === 'checkbox') {
-        <td pFrozenColumn [frozen]="freezeSelection() || false">
-          <p-tableCheckbox [value]="product" />
-        </td>
-      } @else if (selectionMethod() === 'radiobutton') {
-        <td pFrozenColumn [frozen]="freezeSelection() || false">
-          <p-tableRadioButton [value]="product" />
-        </td>
-      }
-      
-      @for (col of columns; track ($index + 'body_col')) {
-        <td
-          [pEditableColumn]="product"
-          [pEditableColumnField]="col.field"
-          pFrozenColumn
-          [frozen]="col.isFrozen || false"
-          [alignFrozen]="col.alignFrozen"
-          [ngClass]="col.columnClass"
-          [pTooltip]="getTooltip(product, col)"
-          [attr.data-editable]="col.columnEditable ? 'true' : null"
-        >
+  <!-- ✅ Normal Mode - Single row -->
+  <tr [ngStyle]="getStyle(product)" [ngClass]="getClass(product)" [pContextMenuRow]="product">
+    @if (expandable()) {
+    <td pFrozenColumn [frozen]="freezeExpansion() || false">
+      <p-button [pRowToggler]="product" [text]="true"
+        [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
+    </td>
+    }
+
+    @if (selectionMethod() === 'checkbox') {
+    <td pFrozenColumn [frozen]="freezeSelection() || false">
+      <p-tableCheckbox [value]="product" />
+    </td>
+    } @else if (selectionMethod() === 'radiobutton') {
+    <td pFrozenColumn [frozen]="freezeSelection() || false">
+      <p-tableRadioButton [value]="product" />
+    </td>
+    }
+
+    @for (col of columns; track ($index + 'body_col')) {
+    <td [pEditableColumn]="product" [pEditableColumnField]="col.field" pFrozenColumn [frozen]="col.isFrozen || false"
+      [alignFrozen]="col.alignFrozen" [ngClass]="col.columnClass" [ngStyle]="col.columnStyle"
+      [pTooltip]="getTooltip(product, col)" [attr.data-editable]="col.columnEditable ? 'true' : null">
       <!-- Condition 1 & 2: col.columnEditable = true -->
-          @if (col.columnEditable) {
-            <p-cellEditor>
+      @if (col.columnEditable) {
+      <p-cellEditor>
         <!-- INPUT MODE -->
-              <ng-template pTemplate="input">
+        <ng-template pTemplate="input">
           <!-- Condition 1: columnEditable=true + columnDesgin=true +
                Condition 2: columnEditable=true + columnDesgin=false -->
-                <input
-                  pInputText
-                  [type]="col.dataType || 'text'"
-                  [(ngModel)]="product[col.field]"
-                  fluid
-                  (keydown)="onEnter($event)"
-                />
-              </ng-template>
+          <input pInputText [type]="col.dataType || 'text'" [(ngModel)]="product[col.field]" fluid
+            (keydown)="onEnter($event)" />
+        </ng-template>
 
         <!-- OUTPUT MODE (view mode when not editing) -->
-              <ng-template pTemplate="output">
+        <ng-template pTemplate="output">
           <!-- Condition 1: columnEditable=true + columnDesgin=true -->
-                @if (col.columnDesgin) {
-                  <ng-container
-                    [ngTemplateOutlet]="col.columnDesgin"
-                    [ngTemplateOutletContext]="{ $implicit: product, editing: false, col: col }">
-                  </ng-container>
+          @if (col.columnDesgin) {
+          <ng-container [ngTemplateOutlet]="col.columnDesgin"
+            [ngTemplateOutletContext]="{ $implicit: product, editing: false, col: col }">
+          </ng-container>
           }
           <!-- Condition 2: columnEditable=true + columnDesgin=false -->
           @else {
-                  {{ product[col.field] }}
-                }
-              </ng-template>
-            </p-cellEditor>
+          {{ product[col.field] }}
+          }
+        </ng-template>
+      </p-cellEditor>
       }
 
       <!-- Condition 3 & 4: col.columnEditable = false -->
       @else {
       <!-- Condition 3: columnEditable=false + columnDesgin=true -->
-            @if (col.columnDesgin) {
-              <ng-container
-                [ngTemplateOutlet]="col.columnDesgin"
-                [ngTemplateOutletContext]="{ $implicit: product, col: col }">
-              </ng-container>
-            } 
-            <!-- Condition 4: columnEditable=false + columnDesgin=false -->
-             @else {
-              {{ product[col.field] }}
-            }
-          }
-        </td>
+      @if (col.columnDesgin) {
+      <ng-container [ngTemplateOutlet]="col.columnDesgin" [ngTemplateOutletContext]="{ $implicit: product, col: col }">
+      </ng-container>
       }
-    </tr>
-  } @else {
-    <!-- ✅ Group Mode -->
-    @if (product === groupedData()[0]?.items?.[0]) {
-      @for (group of groupedData(); track group.groupKey) {
-        <!-- Group row component with selection handlers -->
-        <app-group-row 
-          #groupRow
-          [headerTemplate]="groupHeaderTemplate()!"
-          [columnsInput]="columns || []"
-          [selectedItems]="selectedProducts()"
-          (onGroupSelect)="handleGroupSelect($event)"
-          (onGroupUnselect)="handleGroupUnselect($event)"
-        ></app-group-row>
-        {{ registerGroupRow(groupRow) }}
-        <!-- Render group header -->
-        <ng-container
-          [ngTemplateOutlet]="groupRow.template"
-          [ngTemplateOutletContext]="{ $implicit: group, columnCount: totalColumnCount() }"
-        ></ng-container>
-        
-        <!-- Update checkbox state after render -->
-        {{ groupRow.updateCheckboxState(group.items) }}
-        
-        <!-- Show group items when expanded -->
-        @if (groupRow.isExpanded()) {
-          @for (item of group.items; track item[dataKey()]) {
-            <!-- Render product row -->
-            <tr [ngStyle]="getStyle(item)" [ngClass]="getClass(item)" [pContextMenuRow]="item">
-              @if (expandable()) {
-                <td pFrozenColumn [frozen]="freezeExpansion() || false">
-                  <p-button
-                    [pRowToggler]="item"
-                    [text]="true"
-                    [icon]="expandedRows()[item[dataKey()]] ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-                  />
-                </td>
-              }
-              
-              @if (selectionMethod() === 'checkbox') {
-                <td pFrozenColumn [frozen]="freezeSelection() || false">
-                  <p-tableCheckbox [value]="item" />
-                </td>
-              } @else if (selectionMethod() === 'radiobutton') {
-                <td pFrozenColumn [frozen]="freezeSelection() || false">
-                  <p-tableRadioButton [value]="item" />
-                </td>
-              }
-              
-              @for (col of columns; track ($index + 'body_col')) {
-                <td
-                  [pEditableColumn]="item"
-                  [pEditableColumnField]="col.field"
-                  pFrozenColumn
-                  [frozen]="col.isFrozen || false"
-                  [alignFrozen]="col.alignFrozen"
-                  [ngClass]="col.columnClass"
-                  [pTooltip]="getTooltip(item, col)"
-                >
-                  @if (col.columnEditable) {
-                    <p-cellEditor>
-                      <ng-template pTemplate="input">
-                        <input
-                          pInputText
-                          [type]="col.dataType || 'text'"
-                          [(ngModel)]="item[col.field]"
-                          fluid
-                        />
-                      </ng-template>
-                      <ng-template pTemplate="output">
-                        @if (col.columnDesgin) {
-                          <ng-container
-                            [ngTemplateOutlet]="col.columnDesgin"
-                            [ngTemplateOutletContext]="{ $implicit: item, editing: false, col: col }">
-                          </ng-container>
-                        } @else {
-                          {{ item[col.field] }}
-                        }
-                      </ng-template>
-                    </p-cellEditor>
-                  } @else {
-                    @if (col.columnDesgin) {
-                      <ng-container
-                        [ngTemplateOutlet]="col.columnDesgin"
-                        [ngTemplateOutletContext]="{ $implicit: item, col: col }">
-                      </ng-container>
-                    } @else {
-                      {{ item[col.field] }}
-                    }
-                  }
-                </td>
-              }
-            </tr>
-            
-            <!-- Render expanded row content -->
-            @if (expandable() && expandedRowTemplate() && expandedRows()[item[dataKey()]]) {
-              <tr>
-                <td [attr.colspan]="totalColumnCount()">
-                  <ng-container
-                    [ngTemplateOutlet]="expandedRowTemplate()!"
-                    [ngTemplateOutletContext]="{ $implicit: item }"
-                  ></ng-container>
-                </td>
-              </tr>
-            }
-          }
-        }
-      }
+      <!-- Condition 4: columnEditable=false + columnDesgin=false -->
+      @else {
+    <td> {{ product[col.field] }}</td>
     }
+    }
+    </td>
+    }
+  </tr>
+  } @else {
+  <!-- ✅ Group Mode -->
+  @if (product === groupedData()[0]?.items?.[0]) {
+  @for (group of groupedData(); track group.groupKey) {
+  <!-- Group row component with selection handlers -->
+  <app-group-row #groupRow [headerTemplate]="groupHeaderTemplate()!" [columnsInput]="columns || []"
+    [selectedItems]="selectedProducts()" (onGroupSelect)="handleGroupSelect($event)"
+    (onGroupUnselect)="handleGroupUnselect($event)"></app-group-row>
+  {{ registerGroupRow(groupRow) }}
+  <!-- Render group header -->
+  <ng-container [ngTemplateOutlet]="groupRow.template"
+    [ngTemplateOutletContext]="{ $implicit: group, columnCount: totalColumnCount() }"></ng-container>
+
+  <!-- Update checkbox state after render -->
+  {{ groupRow.updateCheckboxState(group.items) }}
+
+  <!-- Show group items when expanded -->
+  @if (groupRow.isExpanded()) {
+  @for (item of group.items; track item[dataKey()]) {
+  <!-- Render product row -->
+  <tr [ngStyle]="getStyle(item)" [ngClass]="getClass(item)" [pContextMenuRow]="item">
+    @if (expandable()) {
+    <td pFrozenColumn [frozen]="freezeExpansion() || false">
+      <p-button [pRowToggler]="item" [text]="true"
+        [icon]="expandedRows()[item[dataKey()]] ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
+    </td>
+    }
+
+    @if (selectionMethod() === 'checkbox') {
+    <td pFrozenColumn [frozen]="freezeSelection() || false">
+      <p-tableCheckbox [value]="item" />
+    </td>
+    } @else if (selectionMethod() === 'radiobutton') {
+    <td pFrozenColumn [frozen]="freezeSelection() || false">
+      <p-tableRadioButton [value]="item" />
+    </td>
+    }
+
+    @for (col of columns; track ($index + 'body_col')) {
+    <td [pEditableColumn]="item" [pEditableColumnField]="col.field" pFrozenColumn [frozen]="col.isFrozen || false"
+      [alignFrozen]="col.alignFrozen" [ngClass]="col.columnClass" [pTooltip]="getTooltip(item, col)">
+      @if (col.columnEditable) {
+      <p-cellEditor>
+        <ng-template pTemplate="input">
+          <input pInputText [type]="col.dataType || 'text'" [(ngModel)]="item[col.field]" fluid />
+        </ng-template>
+        <ng-template pTemplate="output">
+          @if (col.columnDesgin) {
+          <ng-container [ngTemplateOutlet]="col.columnDesgin"
+            [ngTemplateOutletContext]="{ $implicit: item, editing: false, col: col }">
+          </ng-container>
+          } @else {
+          {{ item[col.field] }}
+          }
+        </ng-template>
+      </p-cellEditor>
+      } @else {
+      @if (col.columnDesgin) {
+      <ng-container [ngTemplateOutlet]="col.columnDesgin" [ngTemplateOutletContext]="{ $implicit: item, col: col }">
+      </ng-container>
+      } @else {
+      {{ item[col.field] }}
+      }
+      }
+    </td>
+    }
+  </tr>
+
+  <!-- Render expanded row content -->
+  @if (expandable() && expandedRowTemplate() && expandedRows()[item[dataKey()]]) {
+  <tr>
+    <td [attr.colspan]="totalColumnCount()">
+      <ng-container [ngTemplateOutlet]="expandedRowTemplate()!"
+        [ngTemplateOutletContext]="{ $implicit: item }"></ng-container>
+    </td>
+  </tr>
+  }
+  }
+  }
+  }
+  }
   }
 </ng-template>

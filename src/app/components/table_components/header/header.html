@@ -16,103 +16,33 @@
       
       @if (columns) {
           @for (column of columns; track ($index + 'header')) {
-          @if (column.resizable && column.isFrozen) {
             <th
               [pSortableColumn]="column.sortable ? column.field : undefined"
               pReorderableColumn="column.field"
               pFrozenColumn
-              [frozen]="true"
-              [alignFrozen]="column.alignFrozen"
+              [frozen]="column.isFrozen"
               pResizableColumn
-              [ngStyle]="{ width: column.width }"
-            >
-              <div style="display: flex; justify-content: space-between; align-items: center">
-                <div>
-                  {{ column.header }}
-                  @if(column.sortable){
-                    <p-sortIcon [field]="column.field" />
-                  }
-                </div>
-                @if (column.filterable) {
-                  <p-columnFilter
-                    [type]="column.filterType || 'text'"
-                    [field]="column.field"
-                    display="menu"
-                  ></p-columnFilter>
-                }
-              </div>
-            </th>
-          } @else if (column.resizable  && !column.isFrozen) {
-            <th
-              [pSortableColumn]="column.sortable ? column.field : undefined"
-              pReorderableColumn="column.field"
-              pResizableColumn
-              [ngStyle]="{ width: column.width }"
-            >
-              <div style="display: flex; justify-content: space-between; align-items: center">
-                <div>
-                  {{ column.header }}
-                  @if(column.sortable){
-                    <p-sortIcon [field]="column.field" />
-                  }
-                </div>
-                @if (column.filterable) {
-                  <p-columnFilter
-                    [type]="column.filterType || 'text'"
-                    [field]="column.field"
-                    display="menu"
-                  ></p-columnFilter>
-                }
-              </div>
-            </th>
-          } @else if (column.resizable === false && column.isFrozen) {
-            <th
-              [pSortableColumn]="column.sortable ? column.field : undefined"
-              pReorderableColumn="column.field"
-              pFrozenColumn
-              [frozen]="true"
+              [pResizableColumnDisabled]="!column.resizable"
               [alignFrozen]="column.alignFrozen"
               [ngStyle]="{ width: column.width }"
             >
-              <div style="display: flex; justify-content: space-between; align-items: center">
-                <div>
+              <div class="header-cell">
+                <div class="header-title">
                   {{ column.header }}
                   @if(column.sortable){
                     <p-sortIcon [field]="column.field" />
                   }
                 </div>
                 @if (column.filterable) {
-                  <p-columnFilter
+                  <p-column-filter
                     [type]="column.filterType || 'text'"
                     [field]="column.field"
                     display="menu"
-                  ></p-columnFilter>
+                  />
                 }
               </div>
             </th>
-          } @else {
-            <th
-              [pSortableColumn]="column.sortable ? column.field : undefined"
-              pReorderableColumn="column.field"
-              [ngStyle]="{ width: column.width }"
-            >
-              <div style="display: flex; justify-content: space-between; align-items: center">
-                <div>
-                  {{ column.header }}
-                  @if(column.sortable){
-                    <p-sortIcon [field]="column.field" />
-                  }
-                </div>
-                @if (column.filterable) {
-                  <p-columnFilter
-                    [type]="column.filterType || 'text'"
-                    [field]="column.field"
-                    display="menu"
-                  ></p-columnFilter>
-                }
-              </div>
-            </th>
-          }
+   
         }
 
       }

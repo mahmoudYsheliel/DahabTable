@@ -1,4 +1,3 @@
-
 <p-toast position="top-right" />
 
 <app-table #dahabTable [tableConfig]="tableConfig()" [(data)]="data" [(selectedProducts)]="selectedRows">
@@ -23,13 +22,14 @@
   </ng-template> -->
 
   <ng-template #captionActionTemplate>
-    <p-button  label="Log Selected" (click)="logSelected()" />
+    <p-button label="Log Selected" (click)="logSelected()"  />
   </ng-template>
   <ng-template #customColumnDesign let-product>
     <p-badge [value]="product.price" [severity]="colstyle(product)" />
   </ng-template>
   <ng-template #customActionColumn let-product>
-    <p-button label="Log Value" (click)="logValue(product)" outlined />
+    <p-button label="Log Value" (click)="logValue(product)" 
+      outlined />
   </ng-template>
 
   <ng-template #rowExpanssionTemp let-item>
@@ -37,10 +37,7 @@
   </ng-template>
 
   <ng-template #subRowExpanssionTemp let-subItem>
-    <app-table
-      [tableConfig]="subSubTableConfig"
-      [data]="subItem.history"
-    >
+    <app-table [tableConfig]="subSubTableConfig" [data]="subItem.history">
     </app-table>
   </ng-template>
 

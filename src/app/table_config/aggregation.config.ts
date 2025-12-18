@@ -13,7 +13,7 @@ export const  AGGREGATION_CONFIG:AggCell[][] = [
       },
       {
         func:()=>{},
-        colSpan:2
+        colSpan:3
       },
       {
         func: aggSum,
@@ -34,7 +34,7 @@ export const  AGGREGATION_CONFIG:AggCell[][] = [
       },
       {
         func:()=>{},
-        colSpan:2
+        colSpan:3
       },
       {
         func: aggAv,

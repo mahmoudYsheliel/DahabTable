@@ -23,11 +23,9 @@ export function getInitialTableConfig(
     dataKey: 'id',
     columns: cols,
     size: 'small',
-    showGridlines: true,
+    showGridlines: false,
     stripedRows: true,
     isLoading: true,
-    rowStyle: rowStyle,
-    rowClass: rowClass,
     paginator: true,
     rows: 100,
     rowsPerPageOptions: [5, 10, 20, 50, 100, 200],
@@ -70,21 +68,21 @@ export function getInitialTableConfig(
     globalFilterFields: ['id', 'code', 'name'],
     captionActionTemplate: captionActionTemplate,
 
-    freezeExpansion: true,
-    freezeSelection: true,
+    freezeExpansion: false,
+    freezeSelection: false,
 
     exportFilename: 'products',
     exportButtons: {
-      csv: true,
-      excel: true,
-      pdf: true,
+      csv: false,
+      excel: false,
+      pdf: false,
     },
 
     contextMenu: true,
     contextMenuItems: contextMenu,
 
     grouping: {
-      enabled: true,
+      enabled: false,
       groupableColumns: ['categoryType', 'name', 'code'] // Only these columns available in dropdown
     }
   };

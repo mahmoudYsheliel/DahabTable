@@ -1,27 +1,44 @@
-
-
 <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 1rem">
   <!-- Left side: Filter, Title, and Grouping -->
   <div style="display: flex; align-items: center; gap: 1rem">
     @if (showFilter()) {
-    <p-button [outlined]="true" icon="pi pi-filter" (click)="menu.toggle($event)" />
+    <p-button outlined icon="pi pi-filter-fill" (click)="menu.toggle($event)"
+      [pt]="{root:{style:'color:#ec1c34;border:#B0BEC5 solid 1px;background-color:transparent'}}" />
 
-    <p-popover #menu>
-      <div class="caption-filter-popover-container">
-        @for (field of fieldsVar(); track ($index + 'caption_filter')) {
-        <p-floatlabel variant="on">
-          <input pInputText [id]="'on_label_' + $index" [(ngModel)]="field.var" />
-          <label [for]="'on_label_' + $index"> {{ field.label }}</label>
-        </p-floatlabel>
-        }
+    <p-popover #menu [pt]="{content:{style:'padding:0 ;font-family:Roboto , sans-serif'}}">
+      <div>
+        <div class="caption-filter-popover-container">
+          <div class="caption-filter-header">
+            <h4 class="caption-filter-title">Filters</h4>
+            <p-button (click)="menu.toggle($event)" icon="pi pi-times"
+              [pt]="{root:{style:'color:#868889;background-color:transparent'}}" outlined text />
+          </div>
+
+          <div class="caption-filter-content">
+            @for (field of fieldsVar(); track ($index + 'caption_filter')) {
+            <p-floatlabel variant="on">
+              <input pInputText class="filter-input-field" [id]="'on_label_' + $index" [(ngModel)]="field.var" />
+              <label class="filter-label" [for]="'on_label_' + $index"> {{ field.label }}</label>
+            </p-floatlabel>
+            }
+          </div>
+
+          <div class="caption-filter-footer">
+            <p-button [pt]="{root:{style:'color:#263238;background-color:transparent'},label:{class:['!test']}}"
+              label="Clear" (click)="clear()" outlined text />
+            <p-button [pt]="{ root:{style:'color:white;background-color:#ec1c34;height:2rem'}}" label="Search"
+              (click)="search()" text />
+          </div>
+
+
+        </div>
       </div>
 
-      <div class="caption-filter-action-container">
-        <p-button label="Clear" (click)="clear()" outlined />
-        <p-button label="Search" (click)="search()" />
-      </div>
+
     </p-popover>
     }
+
+
 
     <!-- Group By Selector -->
     @if (groupingEnabled() && availableGroupFields().length > 0) {
@@ -49,16 +66,16 @@
 
 
     @if (title()) {
-    <p style="margin: 0">{{ table().totalRecords }} {{ title() }}</p>
+    <p class="caption-title">{{ table().totalRecords }} {{ title() }}</p>
     }
   </div>
 
   <!-- Middle: Filter Chips -->
-  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap">
+  <div class="filter-chip-container">
     @if (showFilterChips()) {
     @for (field of appliedFilters(); track $index) {
     @if (field.var()) {
-    <p-chip>
+    <p-chip class="filter-chip">
       <span> {{ field.label }} : {{ field.var() }} </span>
       <i class="pi pi-times-circle" (click)="clearField(field.label)"></i>
     </p-chip>
@@ -68,7 +85,7 @@
 
     <!--  Show active grouping as chip -->
     @if (selectedGroupField()) {
-    <p-chip styleClass="bg-primary">
+    <p-chip>
       <span>Grouped by: {{ selectedGroupHeader() }}</span>
       <i class="pi pi-times-circle" (click)="onGroupChange(null)"></i>
     </p-chip>
@@ -78,8 +95,13 @@
   <!-- Right side: Search and Export Buttons -->
   <div style="display: flex; align-items: center; gap: 0.5rem">
     @if (showInputSearch()) {
-    <input pInputText type="text" [(ngModel)]="searchValue" (input)="table().filterGlobal(searchValue, 'contains')"
-      placeholder="Search keyword" />
+
+
+    <p-iconfield>
+      <p-inputicon class="pi pi-search" />
+      <input pInputText type="text" [(ngModel)]="searchValue" (input)="table().filterGlobal(searchValue, 'contains')"
+        placeholder="Search" style="height: 2rem;" />
+    </p-iconfield>
     }
 
     <!--Export Buttons - now calling local methods -->
@@ -101,7 +123,7 @@
       <p-button type="button" (click)="fileInput.click()" icon="pi pi-upload" outlined />
 
 
-      
+
     </div>
     }
 

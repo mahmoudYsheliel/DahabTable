@@ -1,4 +1,3 @@
-<p>{{data()![0].price}}</p>
 @if (generatedTC().contextMenu) {
   <p-contextmenu 
     #cm 
@@ -49,6 +48,7 @@
   [(contextMenuSelection)]="selectedRowForContextMenu"
   [contextMenu]="cm"
   [resizableColumns]="generatedTC().columnResizeable || true"
+  columnResizeMode="expand"
 >
 
 

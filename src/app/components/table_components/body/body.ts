@@ -119,8 +119,9 @@ export class Body {
     if (!nextTd) return;
     const nextInput = nextTd.querySelector('p-cellEditor')
     if (!nextInput) return;
-    setTimeout(()=>{ nextTd.dispatchEvent(new MouseEvent('click',{bubbles:true}))},10)
-   
+
+     setTimeout(()=>{ nextTd.dispatchEvent(new MouseEvent('click',{bubbles:true}))},10)
+
 
   }
 }

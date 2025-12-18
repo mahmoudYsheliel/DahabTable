@@ -1,0 +1,22 @@
+th {
+    background-color: #F3F3F3 !important;
+    box-shadow: 0 -1px 0 0 #CFD8DC !important;
+    color: #263238 !important;
+    font-weight: 500 !important;
+    padding-inline: 0.75rem !important;
+    padding-block: 0rem !important;
+}
+
+
+.header-cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+.header-title{
+    height: 3rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}

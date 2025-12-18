@@ -1,0 +1,8 @@
+tr{
+    padding: 0 !important;
+}
+td{
+    padding-inline:0.75rem !important;
+    padding-block: 0rem !important;
+    height: 2.25rem !important;
+}

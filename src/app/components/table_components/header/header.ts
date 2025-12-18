@@ -7,6 +7,7 @@ import { NgStyle } from '@angular/common';
 @Component({
   selector: 'app-header',
   templateUrl: './header.html',
+  styleUrl:'./header.css',
   imports: [TableModule, NgStyle], // ✅ TableModule includes p-tableHeaderCheckbox
 })
 export class Header {
