@@ -50,7 +50,7 @@ import { ChangeDetectorRef } from '@angular/core';
   host: { class: 'ignore-wrapper' },
 })
 export class DahabTable {
-  @ViewChild('dt') table!: Table;
+  @ViewChild('dt') table: Table | undefined = undefined;
   @ViewChild('cm') cm!: ContextMenu;
   groupRowComponents = signal<GroupRow[]>([]);
 

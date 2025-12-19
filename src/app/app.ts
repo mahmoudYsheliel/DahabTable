@@ -77,11 +77,12 @@ export class App {
 
     this.subSubTableConfig = SUB_SUB_TABLE_CONFIG;
 
+  
     this.tableConfig.set(
       getInitialTableConfig(
         this.cols,
         this.simulateAPI,
-        this.captionActionTemplate,
+        this.captionActionTemplate && undefined,
         this.rowExpanssionTemp,
         this.logValue,
         this.logValue,

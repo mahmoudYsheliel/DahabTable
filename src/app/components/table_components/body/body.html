@@ -5,7 +5,7 @@
     @if (expandable()) {
     <td pFrozenColumn [frozen]="freezeExpansion() || false">
       <p-button [pRowToggler]="product" [text]="true"
-        [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
+        [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" [style]="{color:'#EC1C34'}" />
     </td>
     }
 

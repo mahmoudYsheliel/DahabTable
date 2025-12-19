@@ -1,6 +1,6 @@
 import { TableConfig } from "../utils/table.interface";
 
-export const SUB_SUB_TABLE_CONFIG:TableConfig = {
+export const SUB_SUB_TABLE_CONFIG: TableConfig = {
   size: 'small',
   dataKey: 'subId',
   columns: [

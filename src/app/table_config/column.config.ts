@@ -34,7 +34,6 @@ export function getColumnConfig(
       filterType: 'numeric',
       columnDesgin: customColumnDesign,
       columnEditable: true,
-       columnStyle:{'text-align':'right'},
       columnEditMethod: (event: any) =>
         onPriceEdit(event.data, event.newValue, event.oldValue, messageService),
       isFrozen: true,

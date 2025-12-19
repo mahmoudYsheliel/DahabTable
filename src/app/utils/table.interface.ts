@@ -117,6 +117,7 @@ export interface TableConfig<TInput = any> {
   exportFilename?: string;
   exportButtons?: ExportMethods;
 
+  importable?:boolean;
   // context menu options
   contextMenu?: boolean;
   contextMenuItems?: TableContextMenu;
@@ -137,6 +138,7 @@ export function getTableConfig(tableConfig: TableConfig | undefined): TableConfi
   return {
     first: 0,
     lazy: false,
+    paginator:true,
     ...tableConfig,
     columns: processedColumns,
   };

@@ -9,6 +9,7 @@
 
 <p-table
   #dt
+  id="table"
   [scrollable]="generatedTC().scrollable"
   [scrollHeight]="generatedTC().scrollHeight"
   [dataKey]="generatedTC().dataKey"
@@ -19,9 +20,9 @@
   [size]="generatedTC().size"
   [showGridlines]="generatedTC().showGridlines"
   [stripedRows]="generatedTC().stripedRows"
-  [paginator]="!currentGroupField() && generatedTC().paginator"
-  [rows]="generatedTC().rows || generatedTC().rowsPerPageOptions?.[0] || 10"
-  [rowsPerPageOptions]="generatedTC().rowsPerPageOptions"
+  [paginator]="generatedTC().paginator"
+  [rows]="generatedTC().rows  || 10"
+  [rowsPerPageOptions]="generatedTC().rowsPerPageOptions || []"
   [first]="generatedTC().first"
   [showCurrentPageReport]="generatedTC().showCurrentPageReport"
   [currentPageReportTemplate]="generatedTC().currentPageReportTemplate || ''"
@@ -120,6 +121,7 @@
       (onGroupFieldChange)="onGroupFieldChange($event)"
       (onExpandAll)="expandAllGroups()"
       (onCollapseAll)="collapseAllGroups()"
+      [importable]="generatedTC().importable"
     />
   </ng-template>
   }

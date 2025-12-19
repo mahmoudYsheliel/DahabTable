@@ -68,8 +68,8 @@ export function getInitialTableConfig(
     globalFilterFields: ['id', 'code', 'name'],
     captionActionTemplate: captionActionTemplate,
 
-    freezeExpansion: false,
-    freezeSelection: false,
+    freezeExpansion: true,
+    freezeSelection: true,
 
     exportFilename: 'products',
     exportButtons: {
@@ -77,6 +77,7 @@ export function getInitialTableConfig(
       excel: false,
       pdf: false,
     },
+    importable:false,
 
     contextMenu: true,
     contextMenuItems: contextMenu,

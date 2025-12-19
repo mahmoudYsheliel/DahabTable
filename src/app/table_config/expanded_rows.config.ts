@@ -1,7 +1,7 @@
 import { TemplateRef } from "@angular/core";
 import { TableConfig } from "../utils/table.interface";
 
-export function getSubTableConfig(subRowExpanssionTemp:TemplateRef<any> | undefined):TableConfig {
+export function getSubTableConfig(subRowExpanssionTemp: TemplateRef<any> | undefined): TableConfig {
   return {
     size: 'small',
     dataKey: 'subId',
@@ -10,6 +10,7 @@ export function getSubTableConfig(subRowExpanssionTemp:TemplateRef<any> | undefi
       { field: 'description', header: 'Description', filterable: true },
       { field: 'amount', header: 'Amount', filterable: true, filterType: 'numeric' },
     ],
+    paginator: true,
     expandable: true,
     expandedRowTempelate: subRowExpanssionTemp,
   };

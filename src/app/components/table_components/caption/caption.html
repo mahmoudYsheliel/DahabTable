@@ -66,7 +66,7 @@
 
 
     @if (title()) {
-    <p class="caption-title">{{ table().totalRecords }} {{ title() }}</p>
+    <p class="caption-title">{{ table()?.totalRecords }} {{ title() }}</p>
     }
   </div>
 
@@ -99,7 +99,7 @@
 
     <p-iconfield>
       <p-inputicon class="pi pi-search" />
-      <input pInputText type="text" [(ngModel)]="searchValue" (input)="table().filterGlobal(searchValue, 'contains')"
+      <input pInputText type="text" [(ngModel)]="searchValue" (input)="table()?.filterGlobal(searchValue, 'contains')"
         placeholder="Search" style="height: 2rem;" />
     </p-iconfield>
     }
@@ -119,10 +119,11 @@
       <p-button pTooltip="Upload Ecel" icon="pi pi-file-pdf" [outlined]="true" severity="danger" size="small"
         pTooltip="Export PDF" (onClick)="exportPDF()" />
       }
-      <input type="file" #fileInput accept=".xlsx,.xls" style="display: none" (change)="onFileSelected($event)" />
+      @if (importable()) {
+         <input type="file" #fileInput accept=".xlsx,.xls" style="display: none" (change)="onFileSelected($event)" />
       <p-button type="button" (click)="fileInput.click()" icon="pi pi-upload" outlined />
 
-
+      }
 
     </div>
     }

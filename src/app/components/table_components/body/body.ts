@@ -10,6 +10,7 @@ import { Tooltip } from "primeng/tooltip";
 import { cellErrorMap } from '../../../table_config/column.config';
 import { GroupRow } from '../group-row/group-row.component';
 import { TableUtils } from '../../../utils/table-utils';
+import { Checkbox } from "primeng/checkbox";
 
 @Component({
   selector: 'app-body',
@@ -22,14 +23,14 @@ import { TableUtils } from '../../../utils/table-utils';
     NgTemplateOutlet,
     InputTextModule,
     Tooltip,
-    GroupRow
-  ],
+    GroupRow,
+],
   templateUrl: './body.html',
   styleUrl: './body.css',
   providers: [MessageService]
 })
 export class Body {
-  table = input.required<Table>()
+  table = input<Table>()
   rowClass = input<Function>();
   rowStyle = input<Function>();
   expandable = input<boolean>();

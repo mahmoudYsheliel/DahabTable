@@ -10,7 +10,7 @@ import { AggCell } from '../../../utils/table.interface';
 })
 export class Footer {
   aggregation = input<AggCell[][]>();
-  table = input.required<Table>();
+  table = input<Table>();
   rerender = model()
 
   isGroupMode = input<boolean>(false);
@@ -54,7 +54,7 @@ export class Footer {
     }
 
     // ✅ Normal mode - use filtered or all data
-    return this.table().filteredValue || this.table().value || [];
+    return this.table()?.filteredValue || this.table()?.value || [];
   }
 
   /**

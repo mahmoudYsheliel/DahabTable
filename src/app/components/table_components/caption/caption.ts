@@ -43,11 +43,11 @@ import { InputIconModule } from 'primeng/inputicon';
   styleUrl: './caption.css',
 })
 export class Caption {
-  table = input.required<Table>();
+  table = input<Table>();
 
   tableConfig = model<TableConfig>()
   data = model<any[]>()
-
+  importable = model<boolean>()
   actionTemplate = input<TemplateRef<any>>();
   title = input<string>();
   showFilter = input<boolean>();
@@ -127,7 +127,7 @@ export class Caption {
   });
 
   clear() {
-    this.table().clear();
+    this.table()?.clear();
     this.searchValue = '';
     if (this.fieldsVar()) {
       for (let field of this.fieldsVar()!) {
@@ -144,7 +144,7 @@ export class Caption {
   search() {
     if (this.fieldsVar()) {
       for (let field of this.fieldsVar()!) {
-        this.table().filter(field.var(), field.label, 'contains');
+        this.table()?.filter(field.var(), field.label, 'contains');
       }
     }
     if (this.appliedFilters() && this.fieldsVar()) {
@@ -175,7 +175,7 @@ export class Caption {
 
   // Export to CSV
   exportCSV() {
-    this.table().exportCSV();
+    this.table()?.exportCSV();
   }
 
   // Export to Excel
@@ -220,9 +220,9 @@ export class Caption {
 
         const doc = new jsPDF();
 
-        const columns = this.table().columns?.map((col: any) => col.header) || [];
+        const columns = this.table()?.columns?.map((col: any) => col.header) || [];
         const rows = this.exportData().map((item: any) =>
-          (this.table().columns || []).map((col: any) => item[col.field])
+          (this.table()?.columns || []).map((col: any) => item[col.field])
         );
 
         autoTable(doc, {
@@ -269,14 +269,14 @@ export class Caption {
       const worksheet = workbook.Sheets[sheetName];
 
       // Convert to JSON
-      const data:Object[] = XLSX.utils.sheet_to_json(worksheet, {
+      const data: Object[] = XLSX.utils.sheet_to_json(worksheet, {
         defval: '',      // keep empty cells
         raw: true        // keep numbers as numbers
       });
-      const keys =Object.keys(data[0])
+      const keys = Object.keys(data[0])
 
-      const colConfig: ColumnConfig[] =keys.map(e=>{return {field:e,header:e.toUpperCase()}  })
-      this.tableConfig.set({columns:colConfig})
+      const colConfig: ColumnConfig[] = keys.map(e => { return { field: e, header: e.toUpperCase() } })
+      this.tableConfig.set({ columns: colConfig })
       this.data.set(data)
     };
 

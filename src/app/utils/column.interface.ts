@@ -25,8 +25,8 @@ export function generateColumnConfig(columnConfigs: ColumnConfig[]) {
   let newConfigList:ColumnConfig[] = []
   for (let columnConfig of columnConfigs){
     newConfigList.push({
-      filterable:true,
-      sortable:true,
+      filterable:false,
+      sortable:false,
       filterType:'text',
       resizable: true,
       ...columnConfig
