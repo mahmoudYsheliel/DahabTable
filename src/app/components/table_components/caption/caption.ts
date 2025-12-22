@@ -43,7 +43,8 @@ import { InputIconModule } from 'primeng/inputicon';
   styleUrl: './caption.css',
 })
 export class Caption {
-  table = input<Table>();
+  table = input.required<Table>();
+  rerender=model()
 
   tableConfig = model<TableConfig>()
   data = model<any[]>()
@@ -282,6 +283,13 @@ export class Caption {
 
     reader.readAsArrayBuffer(file);
 
+  }
+
+
+  searchInput(event:any){
+    
+    this.table().filterGlobal(event.target.value, 'contains');
+    setTimeout(()=>{this.rerender.set(true) },500)
   }
 
 }

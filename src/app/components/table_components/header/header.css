@@ -6,8 +6,6 @@ th {
     padding-inline: 0.75rem !important;
     padding-block: 0rem !important;
 }
-
-
 .header-cell {
     display: flex;
     justify-content: space-between;

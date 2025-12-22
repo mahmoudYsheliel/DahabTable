@@ -1,4 +1,4 @@
-<div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 1rem">
+<div style="display: grid;grid-template-columns: 1fr 1fr 1fr;">
   <!-- Left side: Filter, Title, and Grouping -->
   <div style="display: flex; align-items: center; gap: 1rem">
     @if (showFilter()) {
@@ -66,12 +66,24 @@
 
 
     @if (title()) {
-    <p class="caption-title">{{ table()?.totalRecords }} {{ title() }}</p>
+    <p class="caption-title">{{ table().totalRecords }} {{ title() }}</p>
+    }
+
+        @if (showInputSearch()) {
+
+
+    <p-iconfield>
+      <p-inputicon class="pi pi-search" />
+      <input pInputText type="text" 
+      (input)="searchInput($event)"
+        placeholder="Search" style="height: 2rem;" />
+    </p-iconfield>
     }
   </div>
 
-  <!-- Middle: Filter Chips -->
-  <div class="filter-chip-container">
+
+
+    <div class="filter-chip-container">
     @if (showFilterChips()) {
     @for (field of appliedFilters(); track $index) {
     @if (field.var()) {
@@ -92,17 +104,9 @@
     }
   </div>
 
-  <!-- Right side: Search and Export Buttons -->
+    <!-- Right side: Search and Export Buttons -->
   <div style="display: flex; align-items: center; gap: 0.5rem">
-    @if (showInputSearch()) {
 
-
-    <p-iconfield>
-      <p-inputicon class="pi pi-search" />
-      <input pInputText type="text" [(ngModel)]="searchValue" (input)="table()?.filterGlobal(searchValue, 'contains')"
-        placeholder="Search" style="height: 2rem;" />
-    </p-iconfield>
-    }
 
     <!--Export Buttons - now calling local methods -->
     @if (exportButtons()) {
@@ -130,4 +134,9 @@
 
     <ng-container [ngTemplateOutlet]="actionTemplate()"></ng-container>
   </div>
+
+  <!-- Middle: Filter Chips -->
+
+
+
 </div>

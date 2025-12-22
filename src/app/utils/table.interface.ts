@@ -123,10 +123,13 @@ export interface TableConfig<TInput = any> {
   contextMenuItems?: TableContextMenu;
 
   // ✅ NEW: Row grouping configuration
+
   grouping?: {
     enabled: boolean;
     groupableColumns?: string[]; // ✅ NEW: Specify which column fields can be grouped
   };
+
+
 
   columnResizeable?: boolean; // NEW: Enable/disable column resizing
 }

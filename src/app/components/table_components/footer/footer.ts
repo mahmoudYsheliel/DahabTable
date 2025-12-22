@@ -26,7 +26,6 @@ export class Footer {
   constructor() {
     effect(() => {
       if (this.rerender()) {
-        console.log(1)
         const results: Record<number, Record<number, any>> = {}
         if (!this.aggregation()!) return
         for (let rowIndex = 0; rowIndex < this.aggregation()!.length; rowIndex++) {

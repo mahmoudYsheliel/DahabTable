@@ -43,7 +43,7 @@
   (onEditInit)="onEditInit($event)"
   (onEditComplete)="onEditComplete($event)"
   [reorderableColumns]="generatedTC().reorderableColumns || false"
-  (onFilter)="onFilterChange($event)"
+  (onFilter)="onFilterChange($event);rerender.set(true)"
   (onSort)="onSortChange($event)"
   (onPage)="undefiendHandler(generatedTC().onPage, $event)"
   [(contextMenuSelection)]="selectedRowForContextMenu"
@@ -104,6 +104,7 @@
   <ng-template #caption>
     <app-caption
       [table]="table"
+      [(rerender)]="rerender"
       [(tableConfig)]="tableConfig"
       [(data)]="data"
       [actionTemplate]="generatedTC().captionActionTemplate"

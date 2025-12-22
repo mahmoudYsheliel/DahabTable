@@ -50,7 +50,7 @@ import { ChangeDetectorRef } from '@angular/core';
   host: { class: 'ignore-wrapper' },
 })
 export class DahabTable {
-  @ViewChild('dt') table: Table | undefined = undefined;
+  @ViewChild('dt') table!: Table;
   @ViewChild('cm') cm!: ContextMenu;
   groupRowComponents = signal<GroupRow[]>([]);
 
@@ -108,18 +108,14 @@ export class DahabTable {
   onEditComplete(event: any) {
     console.log(5)
     const { data, field } = event;
-    console.log({event})
-    console.log(this.generatedTC().columns)
-    console.log(field)
+
     const col = TableUtils.findColumn(this.generatedTC().columns || [], field);
-    console.log(col)
     if (!col) return;
 
     const key = TableUtils.generateEditKey(data, field, this.generatedTC().dataKey || 'id');
     const oldValue = this.editingValues.get(key);
     const newValue = data[field];
 
-    console.log(oldValue , newValue , col.columnEditMethod)
     if (oldValue !== newValue && col.columnEditMethod) {
       col.columnEditMethod({ data, newValue, oldValue });
     }

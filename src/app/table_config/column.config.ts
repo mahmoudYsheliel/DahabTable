@@ -10,7 +10,7 @@ export function getColumnConfig(
   messageService: MessageService
 ): ColumnConfig[] {
   return [
-    { field: 'id', header: 'ID', sortable: false, filterable: false, isFrozen: true },
+    { field: 'id', header: 'ID', sortable: false, filterable: true, isFrozen: true },
     { field: 'code', header: 'Code',resizable:false},
     {
       field: 'name',
