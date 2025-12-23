@@ -4,28 +4,25 @@
     @if (showFilter()) {
 
 
-    <p-button outlined icon="pi pi-filter-fill" (click)="menu.toggle($event)"
-      [pt]="{root:{style:'color:#ec1c34;border:#B0BEC5 solid 1px;background-color:transparent'}}" />
+    <p-button outlined icon="pi pi-filter-fill" (click)="menu.toggle($event)"/>
 
     <p-popover #menu [pt]="{content:{style:'padding:0 ;font-family:Roboto , sans-serif'}}">
       <div>
         <div class="caption-filter-popover-container">
           <div class="caption-filter-header">
             <h4 class="caption-filter-title">Filters</h4>
-            <p-button (click)="menu.toggle($event)" icon="pi pi-times"
-              [pt]="{root:{style:'color:#868889;background-color:transparent'}}" outlined text />
+            <p-button (click)="menu.toggle($event)" icon="pi pi-times" outlined text />
           </div>
 
           <div class="caption-filter-content">
-            <ng-container [ngTemplateOutlet]="filterTemplate()"></ng-container>
+            <ng-container [ngTemplateOutlet]="filterTemplate()" ></ng-container>
 
           </div>
 
           <div class="caption-filter-footer">
-            <p-button [pt]="{root:{style:'color:#263238;background-color:transparent'},label:{class:['!test']}}"
+            <p-button [pt]="{root:{style:'color:#263238'}}"
               label="Clear" (click)="clear()" outlined text />
-            <p-button [pt]="{ root:{style:'color:white;background-color:#ec1c34;height:2rem'}}" label="Search"
-              (click)="search()" text />
+            <p-button [pt]="{ root:{style:'height:2rem'}}" label="Search" (click)="search()" />
           </div>
 
 
@@ -67,21 +64,19 @@
     <p class="caption-title">{{ table().totalRecords }} {{ title() }}</p>
     }
 
-        @if (showInputSearch()) {
+    @if (showInputSearch()) {
 
 
-    <p-iconfield>
-      <p-inputicon class="pi pi-search" />
-      <input pInputText type="text" 
-      (input)="searchInput($event)"
-        placeholder="Search" style="height: 2rem;" />
-    </p-iconfield>
+    <p-iconfield class="wrapper">
+      <p-inputicon  class="pi pi-search" />
+      <input pInputText type="text" (input)="searchInput($event)" placeholder="Search" style="height: 2rem;" />
+    </p-iconfield  >
     }
   </div>
 
 
 
-    <div class="filter-chip-container">
+  <div class="filter-chip-container">
     @if (showFilterChips()) {
     @for (field of globalFilterConfig(); track $index) {
     @if (field.value()) {
@@ -102,7 +97,7 @@
     }
   </div>
 
-    <!-- Right side: Search and Export Buttons -->
+  <!-- Right side: Search and Export Buttons -->
   <div style="display: flex; align-items: center; gap: 0.5rem">
 
 
@@ -122,7 +117,7 @@
         pTooltip="Export PDF" (onClick)="exportPDF()" />
       }
       @if (importable()) {
-         <input type="file" #fileInput accept=".xlsx,.xls" style="display: none" (change)="onFileSelected($event)" />
+      <input type="file" #fileInput accept=".xlsx,.xls" style="display: none" (change)="onFileSelected($event)" />
       <p-button type="button" (click)="fileInput.click()" icon="pi pi-upload" outlined />
 
       }

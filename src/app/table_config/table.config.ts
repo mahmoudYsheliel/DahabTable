@@ -22,7 +22,7 @@ export function getInitialTableConfig(
 
 ): TableConfig {
   return {
-    tableStyle: { 'min-width': '800px' },
+    tableStyle: { 'min-width': '800px','height':'500px'},
     dataKey: 'id',
     columns: cols,
     size: 'small',
@@ -54,7 +54,7 @@ export function getInitialTableConfig(
     showFooter: true,
 
     scrollable: true,
-    scrollHeight: '1000px',
+    scrollHeight: '500px',
 
     onFilter,
     onSort,

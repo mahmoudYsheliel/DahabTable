@@ -8,22 +8,3 @@ td {
     height: 2.25rem !important;
 }
 
-
-
-
-
-::ng-deep .p-checkbox .p-checkbox-box {
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-    border: 2px solid #B0BEC5;
-}
-
-::ng-deep .p-checkbox-icon {
-    background-color: #EC1C34;
-    width: 18px;
-    height: 18px;
-    padding: 2px;
-    color: white;
-    border-radius: 4px;
-}
