@@ -1,15 +1,17 @@
 import { TableConfig } from '../utils/table.interface';
 import { ColumnConfig } from '../utils/column.interface';
 import { contextMenu } from './context_menu.config';
-import { TemplateRef } from '@angular/core';
+import { Signal, TemplateRef } from '@angular/core';
 import { rowClass, rowStyle } from './styles.config';
 import { AGGREGATION_CONFIG } from './aggregation.config';
+import { FilterGroup } from '../utils/filter-group.interface';
 
 export function getInitialTableConfig(
   cols: ColumnConfig[],
   simulateAPI: Function,
   captionActionTemplate?: TemplateRef<any> | undefined,
   rowExpanssionTemp?: TemplateRef<any> | undefined,
+  filterTemplate?: TemplateRef<any> | undefined,
   onRowSelect?: (event: any) => void,
   onRowUnselect?: (event: any) => void,
   onCollapse?: (event: any) => void,
@@ -17,6 +19,7 @@ export function getInitialTableConfig(
   onFilter?: (event: any) => void,
   onSort?: (event: any) => void,
   onPage?: (event: any) => void
+
 ): TableConfig {
   return {
     tableStyle: { 'min-width': '800px' },
@@ -85,6 +88,7 @@ export function getInitialTableConfig(
     grouping: {
       enabled: false,
       groupableColumns: ['categoryType', 'name', 'code'] // Only these columns available in dropdown
-    }
+    },
+    filterTemplate,
   };
 }

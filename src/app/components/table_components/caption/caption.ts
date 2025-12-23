@@ -8,6 +8,7 @@ import {
   TemplateRef,
   output,
   model,
+  Signal,
 } from '@angular/core';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
@@ -24,6 +25,7 @@ import * as XLSX from 'xlsx';
 import { TableConfig } from '../../../utils/table.interface';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { FilterGroup } from '../../../utils/filter-group.interface';
 @Component({
   selector: 'app-caption',
   imports: [
@@ -34,7 +36,6 @@ import { InputIconModule } from 'primeng/inputicon';
     ButtonModule,
     ChipModule,
     PopoverModule,
-    FloatLabel,
     FormsModule,
     SelectModule,
     TooltipModule,
@@ -44,7 +45,10 @@ import { InputIconModule } from 'primeng/inputicon';
 })
 export class Caption {
   table = input.required<Table>();
-  rerender=model()
+  filterTemplate = input<TemplateRef<any>>();
+  globalFilterConfig = model<FilterGroup[] | undefined | null>()
+
+  rerender = model()
 
   tableConfig = model<TableConfig>()
   data = model<any[]>()
@@ -107,65 +111,26 @@ export class Caption {
   // ✅ Output event for group field change
   onGroupFieldChange = output<string | null>();
 
-  searchValue: string | undefined;
 
-  fieldsVar = computed(() => {
-    if (this.globalFilterFields()) {
-      return this.globalFilterFields()?.map((f) => {
-        return { label: f, var: signal<any>('') };
-      });
-    }
-    return;
-  });
 
-  appliedFilters = computed(() => {
-    if (this.globalFilterFields()) {
-      return this.globalFilterFields()?.map((f) => {
-        return { label: f, var: signal<any>('') };
-      });
-    }
-    return;
-  });
 
   clear() {
     this.table()?.clear();
-    this.searchValue = '';
-    if (this.fieldsVar()) {
-      for (let field of this.fieldsVar()!) {
-        field.var.set('');
-      }
-    }
-    if (this.appliedFilters()) {
-      for (let field of this.appliedFilters()!) {
-        field.var.set('');
-      }
-    }
+    if (!this.globalFilterConfig()) return
+    this.globalFilterConfig()?.forEach(gf => gf.value.set(''))
   }
 
   search() {
-    if (this.fieldsVar()) {
-      for (let field of this.fieldsVar()!) {
-        this.table()?.filter(field.var(), field.label, 'contains');
-      }
-    }
-    if (this.appliedFilters() && this.fieldsVar()) {
-      for (let field of this.appliedFilters()!) {
-        field.var.set(
-          this.fieldsVar()!.find((f) => f.label == field.label)?.var()
-        );
-      }
+    if (this.globalFilterConfig()) {
+      this.globalFilterConfig()?.forEach(gf => this.table()?.filter(gf.value(), gf.field, gf.filterMethod))
+
     }
   }
 
-  clearField(field: string) {
-    if (this.fieldsVar()) {
-      this.fieldsVar()!.find((f) => f.label == field)?.var.set('');
-    }
+  clearField(gf: FilterGroup) {
+    gf.value.set('')
+     this.table()?.filter(gf.value(), gf.field, gf.filterMethod)
 
-    if (this.appliedFilters()) {
-      this.appliedFilters()!.find((f) => f.label == field)?.var.set('');
-      this.search();
-    }
   }
 
   // ✅ Handle group field selection
@@ -286,10 +251,10 @@ export class Caption {
   }
 
 
-  searchInput(event:any){
-    
+  searchInput(event: any) {
+
     this.table().filterGlobal(event.target.value, 'contains');
-    setTimeout(()=>{this.rerender.set(true) },500)
+    setTimeout(() => { this.rerender.set(true) }, 500)
   }
 
 }

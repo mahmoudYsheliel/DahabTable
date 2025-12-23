@@ -8,7 +8,7 @@ import {
   TablePageEvent,
 } from 'primeng/table';
 import { ColumnConfig, generateColumnConfig } from './column.interface';
-import { TemplateRef } from '@angular/core';
+import { Signal, TemplateRef } from '@angular/core';
 import { TreeTableSortEvent } from 'primeng/treetable';
 import { MenuItem } from 'primeng/api';
 import {
@@ -20,6 +20,7 @@ import {
   TableContextMenu,
 } from './tpyes';
 import { ContextMenu } from 'primeng/contextmenu';
+import { FilterGroup } from './filter-group.interface';
 
 export interface AggCell {
   colSpan: number;
@@ -132,6 +133,9 @@ export interface TableConfig<TInput = any> {
 
 
   columnResizeable?: boolean; // NEW: Enable/disable column resizing
+
+  filterTemplate?:TemplateRef<any>,
+
 }
 
 

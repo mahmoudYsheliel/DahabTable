@@ -1,4 +1,4 @@
-import { Component, signal, ViewChild } from '@angular/core';
+import { Component, computed, signal, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { Product } from './utils/product.interface';
 import { generateProducts } from './utils/data_generator';
@@ -19,6 +19,9 @@ import { getColumnConfig } from './table_config/column.config';
 import { getInitialTableConfig } from './table_config/table.config';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { FilterGroup } from './utils/filter-group.interface';
+import { InputTextModule } from 'primeng/inputtext';
+import { FloatLabel } from 'primeng/floatlabel';
 
 @Component({
   selector: 'app-root',
@@ -31,6 +34,8 @@ import { ToastModule } from 'primeng/toast';
     FormsModule,
     BadgeModule,
     ToastModule,
+    InputTextModule,
+    FloatLabel
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -55,6 +60,9 @@ export class App {
   @ViewChild('footerTemplate', { static: false }) footerTemplate?: TemplateRef<any>;
   @ViewChild('captionActionTemplate', { static: false }) captionActionTemplate?: TemplateRef<any>;
 
+  @ViewChild('filterTemplate', { static: false }) filterTemplate?: TemplateRef<any>;
+
+
   // column, table, subtable configuration intialization
   cols: ColumnConfig[] = [];
   tableConfig = signal<TableConfig>({ columns: this.cols });
@@ -62,6 +70,15 @@ export class App {
   subSubTableConfig: TableConfig = { columns: [] };
   // selected rows
   selectedRows = signal<any[]>([]);
+
+
+  globalFilterId = signal('')
+  globalFilterCode = signal('')
+  globalFilterConfig = signal<FilterGroup[]>(
+   [{ field: 'id', header: 'ID', value:this.globalFilterId, filterMethod: 'contains' },
+    { field: 'code', header: 'Code', value:  this.globalFilterCode, filterMethod: 'contains' }
+    ]
+  )
 
   ngAfterViewInit(): void {
     // after rendering, templates are defiened and added to the configs
@@ -77,13 +94,14 @@ export class App {
 
     this.subSubTableConfig = SUB_SUB_TABLE_CONFIG;
 
-  
+
     this.tableConfig.set(
       getInitialTableConfig(
         this.cols,
         this.simulateAPI,
         this.captionActionTemplate && undefined,
         this.rowExpanssionTemp,
+        this.filterTemplate,
         this.logValue,
         this.logValue,
         this.logValue,

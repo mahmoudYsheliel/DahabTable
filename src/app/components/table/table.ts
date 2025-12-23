@@ -22,6 +22,7 @@ import { MenuItem } from 'primeng/api';
 import { GroupRow } from '../table_components/group-row/group-row.component';
 import { TableUtils } from '../../utils/table-utils';
 import { ChangeDetectorRef } from '@angular/core';
+import { FilterGroup } from '../../utils/filter-group.interface';
 
 
 @Component({
@@ -57,6 +58,7 @@ export class DahabTable {
   // Table config and data
   tableConfig = model<TableConfig>();
   data = model<any[]>([]);
+  globalFilterConfig = model<FilterGroup[]>()
 
   // Selected and expanded rows
   selectedProducts = model<any[]>([]);

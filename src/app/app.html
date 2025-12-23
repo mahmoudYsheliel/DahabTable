@@ -1,6 +1,6 @@
 <p-toast position="top-right" />
 
-<app-table #dahabTable [tableConfig]="tableConfig()" [(data)]="data" [(selectedProducts)]="selectedRows">
+<app-table #dahabTable [tableConfig]="tableConfig()" [(data)]="data" [(selectedProducts)]="selectedRows" [(globalFilterConfig)]="globalFilterConfig">
   <!-- <ng-template #captionTemplate>
     <p>Passed Caption</p>
   </ng-template> -->
@@ -21,15 +21,28 @@
     </tr>
   </ng-template> -->
 
+
+  <ng-template #filterTemplate>
+    <p-floatlabel variant="on">
+      <input pInputText class="filter-input-field" id="idFilter" [(ngModel)]="globalFilterId" />
+      <label class="filter-label" for="idFilter"> ID</label>
+    </p-floatlabel>
+    <p-floatlabel variant="on">
+      <input pInputText class="filter-input-field" id="codeFilter" [(ngModel)]="globalFilterCode" />
+      <label class="filter-label" for="codeFilter">Code</label>
+    </p-floatlabel>
+  </ng-template>
+
+
   <ng-template #captionActionTemplate>
-    <p-button label="Log Selected" (click)="logSelected()"  />
+    <p-button label="Log Selected" (click)="logSelected()" />
   </ng-template>
   <ng-template #customColumnDesign let-product>
     <p-badge [value]="product.price" [severity]="colstyle(product)" />
   </ng-template>
   <ng-template #customActionColumn let-product>
-    <p-button label="Log Value" (click)="logValue(product)" 
-      outlined [style]="{color:'#EC1C34',border:'solid 1px #EC1C34', padding:'4px 6px',fontSize:'12px'}" />
+    <p-button label="Log Value" (click)="logValue(product)" outlined
+      [style]="{color:'#EC1C34',border:'solid 1px #EC1C34', padding:'4px 6px',fontSize:'12px'}" />
   </ng-template>
 
   <ng-template #rowExpanssionTemp let-item>

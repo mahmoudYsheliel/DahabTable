@@ -2,6 +2,8 @@
   <!-- Left side: Filter, Title, and Grouping -->
   <div style="display: flex; align-items: center; gap: 1rem">
     @if (showFilter()) {
+
+
     <p-button outlined icon="pi pi-filter-fill" (click)="menu.toggle($event)"
       [pt]="{root:{style:'color:#ec1c34;border:#B0BEC5 solid 1px;background-color:transparent'}}" />
 
@@ -15,12 +17,8 @@
           </div>
 
           <div class="caption-filter-content">
-            @for (field of fieldsVar(); track ($index + 'caption_filter')) {
-            <p-floatlabel variant="on">
-              <input pInputText class="filter-input-field" [id]="'on_label_' + $index" [(ngModel)]="field.var" />
-              <label class="filter-label" [for]="'on_label_' + $index"> {{ field.label }}</label>
-            </p-floatlabel>
-            }
+            <ng-container [ngTemplateOutlet]="filterTemplate()"></ng-container>
+
           </div>
 
           <div class="caption-filter-footer">
@@ -85,11 +83,11 @@
 
     <div class="filter-chip-container">
     @if (showFilterChips()) {
-    @for (field of appliedFilters(); track $index) {
-    @if (field.var()) {
+    @for (field of globalFilterConfig(); track $index) {
+    @if (field.value()) {
     <p-chip class="filter-chip">
-      <span> {{ field.label }} : {{ field.var() }} </span>
-      <i class="pi pi-times-circle" (click)="clearField(field.label)"></i>
+      <span> {{ field.header }} : {{ field.value() }} </span>
+      <i class="pi pi-times-circle" (click)="clearField(field)"></i>
     </p-chip>
     }
     }
