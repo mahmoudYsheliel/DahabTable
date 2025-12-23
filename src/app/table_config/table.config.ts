@@ -41,7 +41,7 @@ export function getInitialTableConfig(
     },
     sortMode: 'multiple',
     clearFilters: true,
-    selectionMethod: 'checkbox',
+    selectionMethod: 'radiobutton',
     onRowSelect,
     onRowUnselect,
 

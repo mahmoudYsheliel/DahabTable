@@ -21,7 +21,6 @@ import { ContextMenuModule, ContextMenu } from 'primeng/contextmenu';
 import { MenuItem } from 'primeng/api';
 import { GroupRow } from '../table_components/group-row/group-row.component';
 import { TableUtils } from '../../utils/table-utils';
-import { ChangeDetectorRef } from '@angular/core';
 import { FilterGroup } from '../../utils/filter-group.interface';
 
 
@@ -61,7 +60,7 @@ export class DahabTable {
   globalFilterConfig = model<FilterGroup[]>()
 
   // Selected and expanded rows
-  selectedProducts = model<any[]>([]);
+  selectedProducts = model<any[] | any>();
   expandedRows = model<Record<string, boolean>>({});
 
   // Table config with default values
@@ -75,6 +74,7 @@ export class DahabTable {
   currentGroupField = signal<string | null>(null);
   filteredData = signal<any[]>([]);
   
+
   // Computed grouped data from filtered data
   groupedData = computed(() => {
     const field = this.currentGroupField();

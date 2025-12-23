@@ -69,7 +69,7 @@ export class App {
   subTableConfig: TableConfig = { columns: [] };
   subSubTableConfig: TableConfig = { columns: [] };
   // selected rows
-  selectedRows = signal<any[]>([]);
+  selectedRows = signal<any[] | any>(undefined);
 
 
   globalFilterId = signal('')
